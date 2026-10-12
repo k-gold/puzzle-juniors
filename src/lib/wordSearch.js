@@ -54,24 +54,33 @@ export const generateWordSearchPuzzle = (unlockedThemesList) => {
     solutions.push({ word, positions });
   };
 
-  // Place each word
-  for (const word of words) {
-    let placed = false;
-    let attempts = 0;
-    const maxAttempts = 100;
-
-    while (!placed && attempts < maxAttempts) {
-      const dir = directions[Math.floor(Math.random() * directions.length)];
-      const row = Math.floor(Math.random() * size);
-      const col = Math.floor(Math.random() * size);
-
-      if (canPlaceWord(word, row, col, dir)) {
-        placeWord(word, row, col, dir);
-        placed = true;
+  // Place each word at a random spot chosen from every legal spot.
+  // Longest words go first so they are least likely to get squeezed out.
+  const randomSpot = (word) => {
+    const spots = [];
+    for (let row = 0; row < size; row++) {
+      for (let col = 0; col < size; col++) {
+        for (const dir of directions) {
+          if (canPlaceWord(word, row, col, dir)) spots.push({ row, col, dir });
+        }
       }
-      attempts++;
     }
+    return spots.length ? spots[Math.floor(Math.random() * spots.length)] : null;
+  };
+
+  // Rarely, a crowded grid leaves no room for the last word. Start over if so.
+  const byLength = [...words].sort((a, b) => b.length - a.length);
+  for (let attempt = 0; attempt < 20; attempt++) {
+    solutions.length = 0;
+    grid.forEach((r) => r.fill(null));
+    for (const word of byLength) {
+      const spot = randomSpot(word);
+      if (spot) placeWord(word, spot.row, spot.col, spot.dir);
+    }
+    if (solutions.length === words.length) break;
   }
+  // Keep the solution list in the theme's original word order
+  solutions.sort((a, b) => words.indexOf(a.word) - words.indexOf(b.word));
 
   // Fill empty cells with random letters
   for (let r = 0; r < size; r++) {

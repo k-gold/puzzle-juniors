@@ -17,7 +17,8 @@ export function useWordSearch(savedState, progress) {
 
   // Word Search state - start with random puzzle if no saved state
   const [wordSearchPuzzle, setWordSearchPuzzle] = useState(
-    savedState?.wordSearchPuzzle ||
+    () =>
+      savedState?.wordSearchPuzzle ||
       generateWordSearchPuzzle(savedState?.unlockedThemes || ['space', 'ocean', 'forest']),
   );
   const [wsFoundWords, setWsFoundWords] = useState(savedState?.wsFoundWords || []);

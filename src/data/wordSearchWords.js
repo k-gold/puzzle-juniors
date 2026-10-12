@@ -129,7 +129,7 @@ export const WORD_LISTS_BY_THEME = {
     'COCO',
     'BRAVE',
     'TANGLED',
-    'RATATOUILLE',
+    'BOLT',
     'NEMO',
   ],
   heroes: [
