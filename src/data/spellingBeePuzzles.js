@@ -1,42 +1,29 @@
-// Generate random Spelling Bee puzzle
+import { PUZZLES } from './beePuzzleList.js';
+
+const shuffled = (list) => [...list].sort(() => Math.random() - 0.5);
+
+// Pick a random puzzle. The seven letters are mixed up (center last) so they do not
+// spell the pangram. Only letters and center are kept in saved progress; the answers are
+// looked up again with findPuzzle.
 export const generateSpellingBeePuzzle = () => {
-  const puzzles = [
-    { letters: ['C', 'A', 'T', 'R', 'E', 'O', 'N'], center: 'A' },
-    { letters: ['P', 'L', 'A', 'Y', 'E', 'R', 'S'], center: 'L' },
-    { letters: ['S', 'T', 'A', 'R', 'E', 'M', 'K'], center: 'T' },
-    { letters: ['B', 'E', 'A', 'R', 'D', 'K', 'S'], center: 'E' },
-    { letters: ['M', 'O', 'U', 'S', 'E', 'R', 'T'], center: 'O' },
-    { letters: ['H', 'O', 'U', 'S', 'E', 'R', 'T'], center: 'O' },
-    { letters: ['F', 'I', 'R', 'E', 'D', 'S', 'T'], center: 'I' },
-    { letters: ['G', 'A', 'M', 'E', 'S', 'T', 'R'], center: 'A' },
-    { letters: ['W', 'I', 'N', 'D', 'E', 'R', 'S'], center: 'I' },
-    { letters: ['B', 'O', 'A', 'T', 'S', 'R', 'E'], center: 'O' },
-    { letters: ['C', 'O', 'L', 'D', 'E', 'R', 'S'], center: 'O' },
-    { letters: ['P', 'A', 'R', 'T', 'Y', 'S', 'E'], center: 'A' },
-    { letters: ['L', 'I', 'G', 'H', 'T', 'S', 'E'], center: 'I' },
-    { letters: ['S', 'A', 'N', 'D', 'Y', 'E', 'R'], center: 'A' },
-    { letters: ['R', 'O', 'C', 'K', 'S', 'E', 'T'], center: 'O' },
-    { letters: ['F', 'A', 'R', 'M', 'E', 'S', 'T'], center: 'A' },
-    { letters: ['D', 'A', 'N', 'C', 'E', 'R', 'S'], center: 'A' },
-    { letters: ['S', 'I', 'N', 'G', 'E', 'R', 'T'], center: 'I' },
-    { letters: ['B', 'R', 'I', 'G', 'H', 'T', 'S'], center: 'I' },
-    { letters: ['S', 'P', 'O', 'R', 'T', 'Y', 'E'], center: 'O' },
-    { letters: ['C', 'H', 'E', 'A', 'R', 'S', 'T'], center: 'E' },
-    { letters: ['M', 'A', 'G', 'I', 'C', 'S', 'T'], center: 'A' },
-    { letters: ['W', 'O', 'R', 'L', 'D', 'S', 'E'], center: 'O' },
-    { letters: ['F', 'L', 'O', 'W', 'E', 'R', 'S'], center: 'O' },
-    { letters: ['S', 'M', 'I', 'L', 'E', 'T', 'R'], center: 'I' },
-    { letters: ['H', 'A', 'P', 'Y', 'E', 'S', 'R'], center: 'A' },
-    { letters: ['D', 'R', 'E', 'A', 'M', 'S', 'T'], center: 'E' },
-    { letters: ['F', 'R', 'I', 'E', 'N', 'D', 'S'], center: 'I' },
-  ];
-  return puzzles[Math.floor(Math.random() * puzzles.length)];
+  const { letters, center } = PUZZLES[Math.floor(Math.random() * PUZZLES.length)];
+  return {
+    letters: [...shuffled(letters.filter((l) => l !== center)), center],
+    center,
+  };
 };
 
-// A playable puzzle has 7 distinct letters and its center is one of them.
-// Used to discard broken puzzles that an earlier version saved in a player's browser.
+const sameLetters = (a, b) => [...a].sort().join('') === [...b].sort().join('');
+
+// The full puzzle (with its answers) for a saved or generated one, or undefined if unknown
+export const findPuzzle = (p) =>
+  PUZZLES.find((x) => x.center === p.center && sameLetters(x.letters, p.letters));
+
+// A playable puzzle has 7 distinct letters, its center is one of them, and it is one of ours.
+// Used to discard puzzles that an earlier version saved in a player's browser.
 export const isValidPuzzle = (p) =>
   Boolean(p) &&
   Array.isArray(p.letters) &&
   new Set(p.letters).size === 7 &&
-  p.letters.includes(p.center);
+  p.letters.includes(p.center) &&
+  Boolean(findPuzzle(p));

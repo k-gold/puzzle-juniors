@@ -2,7 +2,7 @@
 
 Kid-friendly word games, live at https://puzzlejuniors.com.
 
-- **Letter Puzzle:** a honeycomb spelling game. Make words from seven letters, always using the center one.
+- **Letter Puzzle:** a honeycomb spelling game. Make words from seven letters, always using the center one. Every puzzle hides a word that uses all seven letters (a pangram, worth bonus points), and players earn the ranks Beginner, Good and Great by finding a share of the puzzle's kid-friendly answer list.
 - **Word Search:** find the hidden words in a 10x10 grid. Themes unlock as points are earned.
 - **Guess the Word:** a four-letter word guessing game, with a Daily puzzle and unlimited Practice.
 - **Rewards:** points, badges, unlockable word search themes and color themes.
@@ -48,10 +48,11 @@ src/
   components/           One file per screen, plus Header, Notifications, HexButton
   hooks/                Game state and rules: useProgress, useSpellingBee, useWordSearch, useWordle
   data/                 Word lists, puzzles, color themes, reward catalogs
-  lib/                  Word check, Word Search generator, Wordle scoring, storage, analytics
+  lib/                  Word check, Word Search generator, Wordle scoring, ranks, colors, storage, analytics
 public/
   words.txt             Dictionary used to check guesses (see below)
   icons/                Tab icons
+scripts/                Maintenance scripts (not part of the site build)
 tests/                  Tests, run with node:test
 ```
 
@@ -61,7 +62,16 @@ tests/                  Tests, run with node:test
 
 **Add a Word Search theme.** Add its words to `src/data/wordSearchWords.js` and its card (name, icon, points needed) to `WORD_SEARCH_THEMES` in `src/data/rewards.js`. Words must be 10 letters or fewer. The tests check that both lists match.
 
-**Add a Spelling Bee puzzle.** Add seven distinct letters and a center letter to `src/data/spellingBeePuzzles.js`. The tests require at least 50 findable words.
+**Add a Letter Puzzle.** Puzzles are generated, not typed by hand. Add a 7-letter word that has seven different letters to the `PANGRAMS` list in `scripts/build-bee-puzzles.mjs`, then run:
+
+```
+npm install --no-save wordlist-english
+node scripts/build-bee-puzzles.mjs
+```
+
+This rewrites `src/data/beePuzzleList.js` with the letters, a center letter, and the answers: common words from the word list that can be spelled from those letters. Words that are not right for kids go in the `BLOCKED` list in the same script. Read the new puzzle's answers before committing. The tests check that each puzzle has 30 to 70 answers, that all of them are in `public/words.txt`, and that there is at least one pangram. Players can still enter any valid dictionary word. The answer list only decides the rank.
+
+Players' saved puzzles must be one of the puzzles in the list. If you remove a puzzle, anyone halfway through it gets a new one.
 
 **Add a color theme.** Add the colors to `src/data/colorThemes.js` and its card to `VISUAL_THEMES` in `src/data/rewards.js`.
 

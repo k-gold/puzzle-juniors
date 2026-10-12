@@ -1,46 +1,73 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
-import { generateSpellingBeePuzzle, isValidPuzzle } from '../src/data/spellingBeePuzzles.js';
+import {
+  generateSpellingBeePuzzle,
+  isValidPuzzle,
+  findPuzzle,
+} from '../src/data/spellingBeePuzzles.js';
+import { PUZZLES } from '../src/data/beePuzzleList.js';
+import { isPangram } from '../src/lib/beeRank.js';
 
-const dictionary = readFileSync(new URL('../public/words.txt', import.meta.url), 'utf8').split(
-  '\n',
+const dictionary = new Set(
+  readFileSync(new URL('../public/words.txt', import.meta.url), 'utf8').split('\n'),
 );
 
-// The generator picks at random, so sample it until every puzzle has been seen.
-function allPuzzles() {
-  const seen = new Map();
-  for (let i = 0; i < 5000; i++) {
-    const p = generateSpellingBeePuzzle();
-    seen.set(p.letters.join('') + p.center, p);
-  }
-  return [...seen.values()];
-}
-
 test('every puzzle has 7 distinct letters including the center', () => {
-  for (const p of allPuzzles()) {
+  for (const p of PUZZLES) {
     assert.equal(new Set(p.letters).size, 7, `${p.letters.join('')} needs 7 distinct letters`);
     assert.ok(p.letters.includes(p.center), `${p.letters.join('')} is missing its center`);
   }
 });
 
-test('every puzzle has plenty of words to find', () => {
-  for (const p of allPuzzles()) {
-    const letters = new Set(p.letters.map((l) => l.toLowerCase()));
-    const found = dictionary.filter(
-      (w) => w.includes(p.center.toLowerCase()) && [...w].every((c) => letters.has(c)),
+test('every puzzle has a reasonable number of answers, all spelled from its letters', () => {
+  for (const p of PUZZLES) {
+    assert.ok(
+      p.answers.length >= 30 && p.answers.length <= 70,
+      `${p.letters.join('')} has ${p.answers.length} answers`,
     );
-    assert.ok(found.length >= 50, `${p.letters.join('')} has only ${found.length} words`);
+    assert.equal(new Set(p.answers).size, p.answers.length, 'answers are unique');
+    for (const w of p.answers) {
+      assert.ok(w.length >= 3, `${w} is too short`);
+      assert.ok(w.includes(p.center), `${w} is missing the center letter ${p.center}`);
+      assert.ok(
+        [...w].every((c) => p.letters.includes(c)),
+        `${w} uses a letter not in the puzzle`,
+      );
+      assert.ok(dictionary.has(w.toLowerCase()), `${w} is not in public/words.txt`);
+    }
   }
 });
 
-test('isValidPuzzle rejects puzzles with repeated letters or a missing center', () => {
-  assert.equal(isValidPuzzle({ letters: ['C', 'H', 'E', 'E', 'R', 'S', 'T'], center: 'E' }), false);
-  assert.equal(isValidPuzzle({ letters: ['C', 'H', 'E', 'A', 'R', 'S', 'T'], center: 'Z' }), false);
-  assert.equal(isValidPuzzle(null), false);
-  assert.equal(isValidPuzzle({ letters: ['C', 'H', 'E', 'A', 'R', 'S', 'T'], center: 'E' }), true);
+test('every puzzle has at least one pangram among its answers', () => {
+  for (const p of PUZZLES) {
+    assert.ok(
+      p.answers.some((w) => isPangram(w, p.letters)),
+      `${p.letters.join('')} has no pangram`,
+    );
+  }
 });
 
-test('every generated puzzle passes isValidPuzzle', () => {
-  for (const p of allPuzzles()) assert.equal(isValidPuzzle(p), true);
+test('a generated puzzle is a known puzzle and its letters are mixed up', () => {
+  for (let i = 0; i < 200; i++) {
+    const p = generateSpellingBeePuzzle();
+    assert.ok(findPuzzle(p), `${p.letters.join('')} is not in the list`);
+    assert.equal(p.letters.at(-1), p.center, 'center is last');
+    assert.equal(isValidPuzzle(p), true);
+  }
+});
+
+test('findPuzzle ignores the order the letters are shown in', () => {
+  const { letters, center } = PUZZLES[0];
+  assert.equal(findPuzzle({ letters: [...letters].reverse(), center }), PUZZLES[0]);
+});
+
+test('isValidPuzzle rejects repeated letters, a missing center and unknown puzzles', () => {
+  const { letters, center } = PUZZLES[0];
+  assert.equal(isValidPuzzle({ letters: [...letters.slice(0, 6), letters[0]], center }), false);
+  assert.equal(isValidPuzzle({ letters, center: 'Z' }), false);
+  assert.equal(isValidPuzzle(null), false);
+  // An old puzzle from before curated lists is no longer playable
+  assert.equal(isValidPuzzle({ letters: ['C', 'H', 'E', 'A', 'R', 'S', 'T'], center: 'E' }), false);
+  assert.equal(isValidPuzzle({ letters, center }), true);
 });

@@ -1,6 +1,7 @@
 import { useEffect } from 'react';
 import ShuffleIcon from './ShuffleIcon.jsx';
 import HexButton from './HexButton.jsx';
+import { isPangram, isPositiveMessage } from '../lib/beeRank.js';
 
 const sectionLabel = (colors) => ({
   fontSize: '13px',
@@ -24,9 +25,11 @@ export default function SpellingBee({
   shuffleLetters,
   handleLetterClick,
   outerLetters,
+  beeProgress,
 }) {
   const canSubmit = !isValidating && currentWord.length >= 3;
-  const messageIsGood = message.includes('Great') || message.includes('Checking');
+  const messageIsGood = isPositiveMessage(message);
+  const { rank, found, total, next, pangramCount, pangramFound } = beeProgress;
 
   // Let players type on a physical keyboard
   const letters = [puzzle.center, ...outerLetters].map((l) => l.toLowerCase());
@@ -80,6 +83,56 @@ export default function SpellingBee({
   return (
     <>
       <h2 style={sectionLabel(colors)}>Letter Puzzle</h2>
+
+      <div
+        style={{
+          maxWidth: '420px',
+          width: '100%',
+          margin: '10px auto 0',
+          boxSizing: 'border-box',
+          background: colors.surface,
+          borderRadius: '16px',
+          padding: '12px 14px',
+          boxShadow: '0 1px 2px rgba(0,0,0,0.06), 0 6px 16px rgba(0,0,0,0.04)',
+        }}
+      >
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline' }}>
+          <span style={{ fontSize: '17px', fontWeight: '800', color: colors.text }}>{rank}</span>
+          <span style={{ fontSize: '13px', fontWeight: '700', color: colors.textLight }}>
+            {found} of {total} words
+          </span>
+        </div>
+        <div
+          role="progressbar"
+          aria-label="Words found"
+          aria-valuemin={0}
+          aria-valuemax={total}
+          aria-valuenow={found}
+          style={{
+            height: '8px',
+            borderRadius: '999px',
+            background: `${colors.textLight}22`,
+            margin: '8px 0',
+            overflow: 'hidden',
+          }}
+        >
+          <div
+            style={{
+              height: '100%',
+              width: `${Math.min(100, (found / total) * 100)}%`,
+              background: colors.primary,
+              borderRadius: '999px',
+              transition: 'width 0.3s ease',
+            }}
+          />
+        </div>
+        <div style={{ fontSize: '13px', fontWeight: '600', color: colors.textLight }}>
+          {next ? `Next: ${next.name} at ${next.at} words. ` : 'You reached the top rank! '}
+          {pangramFound
+            ? 'Pangram found!'
+            : `Hint: ${pangramCount === 1 ? '1 word uses' : `${pangramCount} words use`} all 7 letters.`}
+        </div>
+      </div>
 
       <div
         style={{
@@ -246,14 +299,16 @@ export default function SpellingBee({
                   key={word}
                   style={{
                     padding: '7px 14px',
-                    background: `${colors.primary}12`,
-                    color: colors.text,
+                    background: isPangram(word, puzzle.letters)
+                      ? colors.primary
+                      : `${colors.primary}12`,
+                    color: isPangram(word, puzzle.letters) ? colors.onPrimary : colors.text,
                     borderRadius: '999px',
                     fontSize: '14px',
                     fontWeight: '700',
                   }}
                 >
-                  {word}
+                  {isPangram(word, puzzle.letters) ? `★ ${word}` : word}
                 </span>
               ))}
             </div>
