@@ -1,17 +1,16 @@
 import { useState } from 'react';
 import { generateWordSearchPuzzle } from '../lib/wordSearch.js';
 
+// Extra points for finding the last word of a puzzle
+const FINISH_BONUS = 25;
+
 export function useWordSearch(savedState, progress) {
   const {
-    points,
     unlockedThemes,
-    badges,
-    totalWordsFound,
     setTotalWordsFound,
-    gamesCompleted,
     setGamesCompleted,
     awardPoints,
-    awardBadge,
+    addCount,
     calculatePoints,
   } = progress;
 
@@ -20,6 +19,8 @@ export function useWordSearch(savedState, progress) {
     () => savedState?.wordSearchPuzzle || generateWordSearchPuzzle(unlockedThemes),
   );
   const [wsFoundWords, setWsFoundWords] = useState(savedState?.wsFoundWords || []);
+  // Wrong guesses in this puzzle (a puzzle with none earns the Sharp Eyes badge)
+  const [wsMisses, setWsMisses] = useState(savedState?.wsMisses || 0);
   const [wsSelectedCells, setWsSelectedCells] = useState([]);
   const [isSelecting, setIsSelecting] = useState(false);
 
@@ -113,47 +114,25 @@ export function useWordSearch(savedState, progress) {
         if (!wsFoundWords.includes(solution.word)) {
           const newWsFoundWords = [...wsFoundWords, solution.word].sort();
           setWsFoundWords(newWsFoundWords);
-          const earnedPoints = calculatePoints(solution.word.length);
+          const finished = newWsFoundWords.length === wordSearchPuzzle.solutions.length;
+          const earnedPoints =
+            calculatePoints(solution.word.length) + (finished ? FINISH_BONUS : 0);
           awardPoints(earnedPoints, 'wordsearch');
 
-          // Track total words
           setTotalWordsFound((prev) => prev + 1);
-          const newTotal = totalWordsFound + 1;
 
-          // Word milestone badges
-          if (newTotal === 25 && !badges.includes('word-finder')) {
-            setTimeout(() => awardBadge('word-finder', 'Word Finder', '🔍'), 100);
-          }
-          if (newTotal === 50 && !badges.includes('word-hunter')) {
-            setTimeout(() => awardBadge('word-hunter', 'Word Hunter', '🎪'), 100);
-          }
-          if (newTotal === 100 && !badges.includes('word-master')) {
-            setTimeout(() => awardBadge('word-master', 'Word Master', '👑'), 100);
-          }
-          if (newTotal === 200 && !badges.includes('word-champion')) {
-            setTimeout(() => awardBadge('word-champion', 'Word Champion', '🏆'), 100);
-          }
-          if (newTotal === 300 && !badges.includes('word-legend')) {
-            setTimeout(() => awardBadge('word-legend', 'Word Legend', '⭐'), 100);
-          }
-
-          // Point-based badges
-          const currentPoints = points + earnedPoints;
-          if (currentPoints >= 1000 && !badges.includes('point-king')) {
-            setTimeout(() => awardBadge('point-king', 'Point King', '👑'), 200);
-          }
-          if (currentPoints >= 2500 && !badges.includes('mega-collector')) {
-            setTimeout(() => awardBadge('mega-collector', 'Mega Collector', '💰'), 200);
-          }
-
-          // Check if puzzle completed
-          if (newWsFoundWords.length === wordSearchPuzzle.solutions.length) {
-            awardBadge('perfect-game', 'Perfect Game', '💯');
+          // Finishing the puzzle earns a bonus and counts toward badges
+          if (finished) {
+            addCount('searchesFinished');
+            if (wsMisses === 0) addCount('cleanSearches');
           }
         }
-        break;
+        return;
       }
     }
+
+    // Nothing matched. A single tapped cell is not a guess.
+    if (wsSelectedCells.length > 1) setWsMisses((prev) => prev + 1);
   };
 
   const isCellSelected = (row, col) => {
@@ -174,36 +153,10 @@ export function useWordSearch(savedState, progress) {
   const newWordSearch = () => {
     setWordSearchPuzzle(generateWordSearchPuzzle(unlockedThemes));
     setWsFoundWords([]);
+    setWsMisses(0);
     setWsSelectedCells([]);
 
-    // Track game completion
-    const newGamesCompleted = (gamesCompleted.wordsearch || 0) + 1;
-    setGamesCompleted((prev) => ({ ...prev, wordsearch: newGamesCompleted }));
-
-    // Award search badges
-    if (newGamesCompleted === 5 && !badges.includes('search-novice')) {
-      setTimeout(() => awardBadge('search-novice', 'Search Novice', '🔎'), 100);
-    }
-    if (newGamesCompleted === 10 && !badges.includes('search-expert')) {
-      setTimeout(() => awardBadge('search-expert', 'Search Expert', '🔍'), 100);
-    }
-    if (newGamesCompleted === 25 && !badges.includes('search-champion')) {
-      setTimeout(() => awardBadge('search-champion', 'Search Champion', '🥈'), 100);
-    }
-
-    // Check combo-master (played all 3 games)
-    const updatedCompleted = {
-      ...gamesCompleted,
-      wordsearch: newGamesCompleted,
-    };
-    if (
-      updatedCompleted.spelling >= 1 &&
-      updatedCompleted.wordsearch >= 1 &&
-      updatedCompleted.wordle >= 1 &&
-      !badges.includes('combo-master')
-    ) {
-      setTimeout(() => awardBadge('combo-master', 'Combo Master', '🎮'), 200);
-    }
+    setGamesCompleted((prev) => ({ ...prev, wordsearch: (prev.wordsearch || 0) + 1 }));
   };
 
   return {
@@ -211,6 +164,7 @@ export function useWordSearch(savedState, progress) {
     setWordSearchPuzzle,
     wsFoundWords,
     setWsFoundWords,
+    wsMisses,
     wsSelectedCells,
     setWsSelectedCells,
     isSelecting,

@@ -5,6 +5,7 @@ import { useProgress } from './hooks/useProgress.js';
 import { useSpellingBee } from './hooks/useSpellingBee.js';
 import { useWordSearch } from './hooks/useWordSearch.js';
 import { useWordle } from './hooks/useWordle.js';
+import { useBadges } from './hooks/useBadges.js';
 import Header from './components/Header.jsx';
 import Notifications from './components/Notifications.jsx';
 import SpellingBee from './components/SpellingBee.jsx';
@@ -35,6 +36,7 @@ export default function App() {
     ...wordSearch,
     ...wordle,
   };
+  useBadges(ctx);
 
   // Save state to localStorage whenever it changes
   const {
@@ -46,6 +48,9 @@ export default function App() {
     unlockedVisualThemes,
     currentVisualTheme,
     colorBlindMode,
+    counters,
+    lastPlayedDate,
+    wsMisses,
     badges,
     totalWordsFound,
     gamesCompleted,
@@ -82,6 +87,9 @@ export default function App() {
       unlockedVisualThemes,
       currentVisualTheme,
       colorBlindMode,
+      counters,
+      lastPlayedDate,
+      wsMisses,
       badges,
       totalWordsFound,
       gamesCompleted,
@@ -118,6 +126,9 @@ export default function App() {
     unlockedVisualThemes,
     currentVisualTheme,
     colorBlindMode,
+    counters,
+    lastPlayedDate,
+    wsMisses,
     badges,
     totalWordsFound,
     gamesCompleted,

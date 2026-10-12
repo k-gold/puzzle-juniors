@@ -3,9 +3,10 @@ export default function Notifications({
   activeGame,
   showPointsAnimation,
   animatedPoints,
-  showBadgeNotification,
-  newBadge,
+  toasts,
 }) {
+  const toast = toasts[0];
+
   return (
     <>
       {/* Points Animation Popup */}
@@ -30,9 +31,10 @@ export default function Notifications({
         </div>
       )}
 
-      {/* Badge Notification Flyover */}
-      {showBadgeNotification && newBadge && (
+      {/* Flyover for a badge earned or a theme unlocked. Shown one at a time. */}
+      {toast && (
         <div
+          key={toast.id}
           style={{
             position: 'fixed',
             top: 'calc(env(safe-area-inset-top) + 124px)',
@@ -62,7 +64,7 @@ export default function Notifications({
                 fontSize: '40px',
               }}
             >
-              {newBadge.icon}
+              {toast.icon}
             </div>
             <div>
               <div
@@ -73,7 +75,7 @@ export default function Notifications({
                   marginBottom: '4px',
                 }}
               >
-                Badge Unlocked!
+                {toast.title}
               </div>
               <div
                 style={{
@@ -82,7 +84,7 @@ export default function Notifications({
                   color: colors.text,
                 }}
               >
-                {newBadge.name}
+                {toast.name}
               </div>
             </div>
           </div>

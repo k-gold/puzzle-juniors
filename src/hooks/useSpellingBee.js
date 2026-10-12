@@ -11,17 +11,8 @@ import { rankProgress, isPangram, isPositiveMessage } from '../lib/beeRank.js';
 const PANGRAM_BONUS = 20;
 
 export function useSpellingBee(savedState, progress) {
-  const {
-    points,
-    badges,
-    totalWordsFound,
-    setTotalWordsFound,
-    gamesCompleted,
-    setGamesCompleted,
-    awardPoints,
-    awardBadge,
-    calculatePoints,
-  } = progress;
+  const { setTotalWordsFound, setGamesCompleted, awardPoints, addCount, calculatePoints } =
+    progress;
 
   // Spelling Bee state - start with random puzzle if no saved state
   // A saved puzzle that is not playable (an old bug) is replaced along with its found words.
@@ -40,9 +31,7 @@ export function useSpellingBee(savedState, progress) {
     foundWords.filter((w) => answers.includes(w)).length,
     answers.length,
   );
-  const pangramCount = answers.filter((w) => isPangram(w, puzzle.letters)).length;
-  const pangramFound = foundWords.some((w) => isPangram(w, puzzle.letters));
-  const puzzleProgress = { ...progressNow, pangramCount, pangramFound };
+  const puzzleProgress = progressNow;
 
   const handleSubmit = async () => {
     if (currentWord.length < 3) {
@@ -112,27 +101,13 @@ export function useSpellingBee(savedState, progress) {
       }
       if (pangram || rankAfter !== progressNow.rank) setTimeout(() => setMessage(''), 2500);
 
-      // Track total words and check badges
       setTotalWordsFound((prev) => prev + 1);
-      const newTotal = totalWordsFound + 1;
 
-      // Badge checks
-      if (newTotal === 25) awardBadge('word-finder', 'Word Finder', '🔍');
-      if (newTotal === 50) awardBadge('word-hunter', 'Word Hunter', '🎪');
-      if (newTotal === 100) awardBadge('word-master', 'Word Master', '👑');
-      if (newTotal === 200) awardBadge('word-champion', 'Word Champion', '🏆');
-      if (newTotal === 300) awardBadge('word-legend', 'Word Legend', '⭐');
-      if (upperWord.length >= 7) awardBadge('spelling-master', 'Spelling Master', '📝');
-      if (newFoundWords.length >= 5) awardBadge('quick-thinker', 'Quick Thinker', '⚡');
-
-      // Point-based badges
-      const currentPoints = points + earnedPoints;
-      if (currentPoints >= 1000 && !badges.includes('point-king')) {
-        setTimeout(() => awardBadge('point-king', 'Point King', '👑'), 100);
-      }
-      if (currentPoints >= 2500 && !badges.includes('mega-collector')) {
-        setTimeout(() => awardBadge('mega-collector', 'Mega Collector', '💰'), 100);
-      }
+      // Count what badges are measured against
+      if (pangram) addCount('pangrams');
+      if (rankAfter === 'Great' && progressNow.rank !== 'Great') addCount('greatBees');
+      if (foundAfter === answers.length && progressNow.found < answers.length)
+        addCount('fullHives');
     } else {
       setMessage('Not in word list');
       setTimeout(() => {
@@ -154,31 +129,7 @@ export function useSpellingBee(savedState, progress) {
     setFoundWords([]);
     setMessage('');
 
-    // Track game completion
-    const newGamesCompleted = (gamesCompleted.spelling || 0) + 1;
-    setGamesCompleted((prev) => ({ ...prev, spelling: newGamesCompleted }));
-
-    // Award bee badges
-    if (newGamesCompleted === 5 && !badges.includes('bee-novice')) {
-      setTimeout(() => awardBadge('bee-novice', 'Bee Novice', '🐝'), 100);
-    }
-    if (newGamesCompleted === 10 && !badges.includes('bee-expert')) {
-      setTimeout(() => awardBadge('bee-expert', 'Bee Expert', '🐝'), 100);
-    }
-    if (newGamesCompleted === 25 && !badges.includes('bee-champion')) {
-      setTimeout(() => awardBadge('bee-champion', 'Bee Champion', '🥇'), 100);
-    }
-
-    // Check combo-master (played all 3 games)
-    const updatedCompleted = { ...gamesCompleted, spelling: newGamesCompleted };
-    if (
-      updatedCompleted.spelling >= 1 &&
-      updatedCompleted.wordsearch >= 1 &&
-      updatedCompleted.wordle >= 1 &&
-      !badges.includes('combo-master')
-    ) {
-      setTimeout(() => awardBadge('combo-master', 'Combo Master', '🎮'), 200);
-    }
+    setGamesCompleted((prev) => ({ ...prev, spelling: (prev.spelling || 0) + 1 }));
   };
 
   // Helper function to handle letter clicks - clears invalid word messages

@@ -6,18 +6,14 @@ import { shareSquare } from '../lib/wordleColors.js';
 
 export function useWordle(savedState, progress) {
   const {
-    points,
-    badges,
-    totalWordsFound,
     setTotalWordsFound,
-    gamesCompleted,
     setGamesCompleted,
     wordleWins,
     setWordleWins,
     wordleStreak,
     setWordleStreak,
     awardPoints,
-    awardBadge,
+    addCount,
     colorBlindMode,
   } = progress;
 
@@ -156,9 +152,11 @@ export function useWordle(savedState, progress) {
               earnedPoints = 10;
           }
 
+          // Winning the daily puzzle earns a bonus that grows with the streak (up to +35)
+          if (wordleMode === 'daily') earnedPoints += 10 + Math.min(25, 5 * dailyStreak);
+
           awardPoints(earnedPoints, 'wordle');
-          const newTotalWords = totalWordsFound + 1;
-          setTotalWordsFound(newTotalWords);
+          setTotalWordsFound((prev) => prev + 1);
 
           // Handle daily vs practice stats separately
           if (wordleMode === 'daily') {
@@ -175,14 +173,6 @@ export function useWordle(savedState, progress) {
             if (newDailyStreak > dailyMaxStreak) {
               setDailyMaxStreak(newDailyStreak);
             }
-
-            // Daily-specific badges
-            if (newDailyStreak === 5 && !badges.includes('perfect-streak')) {
-              setTimeout(() => awardBadge('perfect-streak', 'Perfect Streak', '🔥'), 1600);
-            }
-            if (newDailyStreak === 10 && !badges.includes('unstoppable')) {
-              setTimeout(() => awardBadge('unstoppable', 'Unstoppable', '🔥'), 1700);
-            }
           } else {
             // Practice mode - update practice stats
             const newPracticeWins = practiceWins + 1;
@@ -197,55 +187,9 @@ export function useWordle(savedState, progress) {
           const newWordleStreak = wordleStreak + 1;
           setWordleStreak(newWordleStreak);
 
-          // Wordle-specific badges
-          if (newGuesses.length <= 2 && !badges.includes('speed-demon')) {
-            setTimeout(() => awardBadge('speed-demon', 'Speed Demon', '⚡'), 1600);
-          }
-          if (newWordleWins === 1 && !badges.includes('wordle-rookie')) {
-            setTimeout(() => awardBadge('wordle-rookie', 'Wordle Rookie', '🎲'), 1600);
-          }
-          if (newWordleWins === 5 && !badges.includes('wordle-ace')) {
-            setTimeout(() => awardBadge('wordle-ace', 'Wordle Ace', '🎯'), 1600);
-          }
-          if (newWordleWins === 25 && !badges.includes('wordle-master')) {
-            setTimeout(() => awardBadge('wordle-master', 'Wordle Master', '👑'), 1600);
-          }
-
-          // Check if word contains letter E
-          if (wordleTarget.includes('E') && !badges.includes('e-badge')) {
-            setTimeout(() => awardBadge('e-badge', 'E Badge', '🅴'), 1700);
-          }
-
-          // General word badges
-          if (newTotalWords === 25 && !badges.includes('word-finder')) {
-            setTimeout(() => awardBadge('word-finder', 'Word Finder', '🔍'), 1800);
-          }
-          if (newTotalWords === 50 && !badges.includes('word-hunter')) {
-            setTimeout(() => awardBadge('word-hunter', 'Word Hunter', '🎪'), 1800);
-          }
-          if (newTotalWords === 100 && !badges.includes('word-master')) {
-            setTimeout(() => awardBadge('word-master', 'Word Master', '👑'), 1800);
-          }
-          if (newTotalWords === 200 && !badges.includes('word-champion')) {
-            setTimeout(() => awardBadge('word-champion', 'Word Champion', '🏆'), 1800);
-          }
-
-          // New gameplay badges
-          if (newTotalWords === 300 && !badges.includes('word-legend')) {
-            setTimeout(() => awardBadge('word-legend', 'Word Legend', '⭐'), 1900);
-          }
-          if (newWordleWins === 50 && !badges.includes('wordle-legend')) {
-            setTimeout(() => awardBadge('wordle-legend', 'Wordle Legend', '🏅'), 1600);
-          }
-
-          // Point-based badges (check after awarding points)
-          const currentPoints = points + earnedPoints;
-          if (currentPoints >= 1000 && !badges.includes('point-king')) {
-            setTimeout(() => awardBadge('point-king', 'Point King', '👑'), 1800);
-          }
-          if (currentPoints >= 2500 && !badges.includes('mega-collector')) {
-            setTimeout(() => awardBadge('mega-collector', 'Mega Collector', '💰'), 1900);
-          }
+          // Count what badges are measured against
+          if (newGuesses.length <= 2) addCount('fastWins');
+          if (wordleTarget.includes('E')) addCount('eWins');
         } else if (newGuesses.length >= 6) {
           setWordleGameOver(true);
 
@@ -358,19 +302,7 @@ export function useWordle(savedState, progress) {
     setWordleWon(false);
 
     // Increment practice games
-    const newGamesCompleted = gamesCompleted.wordle ? gamesCompleted.wordle + 1 : 1;
-    setGamesCompleted((prev) => ({ ...prev, wordle: newGamesCompleted }));
-
-    // Check combo-master (played all 3 games)
-    const updatedCompleted = { ...gamesCompleted, wordle: newGamesCompleted };
-    if (
-      updatedCompleted.spelling >= 1 &&
-      updatedCompleted.wordsearch >= 1 &&
-      updatedCompleted.wordle >= 1 &&
-      !badges.includes('combo-master')
-    ) {
-      setTimeout(() => awardBadge('combo-master', 'Combo Master', '🎮'), 100);
-    }
+    setGamesCompleted((prev) => ({ ...prev, wordle: (prev.wordle || 0) + 1 }));
   };
 
   // Wordle: status of one letter in a guess ('correct' | 'present' | 'absent')

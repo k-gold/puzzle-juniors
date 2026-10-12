@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { WORD_SEARCH_THEMES } from '../data/rewards.js';
 
 export function useProgress(savedState) {
@@ -30,9 +30,44 @@ export function useProgress(savedState) {
   // Accessibility: Wordle uses blue and orange instead of green and yellow
   const [colorBlindMode, setColorBlindMode] = useState(savedState?.colorBlindMode === true);
 
-  // Badge notification
-  const [showBadgeNotification, setShowBadgeNotification] = useState(false);
-  const [newBadge, setNewBadge] = useState(null);
+  // Things counted as they happen, used by badges. New counters can be added here.
+  const [counters, setCounters] = useState({
+    pangrams: 0,
+    greatBees: 0,
+    fullHives: 0,
+    searchesFinished: 0,
+    cleanSearches: 0,
+    fastWins: 0,
+    eWins: 0,
+    daysPlayed: 0,
+    ...savedState?.counters,
+  });
+  const [lastPlayedDate, setLastPlayedDate] = useState(savedState?.lastPlayedDate || '');
+  const addCount = (name, amount = 1) =>
+    setCounters((prev) => ({ ...prev, [name]: prev[name] + amount }));
+
+  // Popups (badges earned, themes unlocked). They are shown one at a time, three seconds each.
+  const [toasts, setToasts] = useState([]);
+  const nextToastId = useRef(0);
+  const notify = (toast) => setToasts((prev) => [...prev, { ...toast, id: nextToastId.current++ }]);
+  const currentToastId = toasts[0]?.id;
+  useEffect(() => {
+    if (currentToastId === undefined) return;
+    const timer = setTimeout(() => setToasts((prev) => prev.slice(1)), 3000);
+    return () => clearTimeout(timer);
+  }, [currentToastId]);
+
+  // Tell the player when a Word Search theme unlocks
+  const knownThemes = useRef(unlockedThemes.length);
+  useEffect(() => {
+    WORD_SEARCH_THEMES.filter((t) => unlockedThemes.includes(t.id))
+      .slice(knownThemes.current)
+      .forEach((t) =>
+        notify({ icon: t.icon, title: 'Theme Unlocked!', name: `${t.name} Word Search` }),
+      );
+    knownThemes.current = unlockedThemes.length;
+  }, [unlockedThemes.length]);
+
   const [badgeTooltip, setBadgeTooltip] = useState(null);
 
   // Award points with animation
@@ -52,25 +87,11 @@ export function useProgress(savedState) {
       setWordlePoints((prev) => prev + amount);
     }
 
-    // Check point milestone badges
-    if (newPoints >= 250 && !badges.includes('rising-star')) {
-      setTimeout(() => awardBadge('rising-star', 'Rising Star', '🌟'), 1600);
-    }
-    if (newPoints >= 500 && !badges.includes('point-collector')) {
-      setTimeout(() => awardBadge('point-collector', 'Point Collector', '💰'), 1600);
-    }
-    if (newPoints >= 750 && !badges.includes('point-master')) {
-      setTimeout(() => awardBadge('point-master', 'Point Master', '💎'), 1600);
-    }
-  };
-
-  // Award badge with flyover notification
-  const awardBadge = (badgeId, badgeName, badgeIcon) => {
-    if (!badges.includes(badgeId)) {
-      setBadges((prev) => [...prev, badgeId]);
-      setNewBadge({ id: badgeId, name: badgeName, icon: badgeIcon });
-      setShowBadgeNotification(true);
-      setTimeout(() => setShowBadgeNotification(false), 3000);
+    // Count each day the player earns points on
+    const today = new Date().toDateString();
+    if (lastPlayedDate !== today) {
+      setLastPlayedDate(today);
+      addCount('daysPlayed');
     }
   };
 
@@ -111,14 +132,14 @@ export function useProgress(savedState) {
     setWordleWins,
     wordleStreak,
     setWordleStreak,
-    showBadgeNotification,
-    setShowBadgeNotification,
-    newBadge,
-    setNewBadge,
+    counters,
+    addCount,
+    lastPlayedDate,
+    toasts,
+    notify,
     badgeTooltip,
     setBadgeTooltip,
     awardPoints,
-    awardBadge,
     calculatePoints,
   };
 }

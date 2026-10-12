@@ -29,7 +29,7 @@ export default function SpellingBee({
 }) {
   const canSubmit = !isValidating && currentWord.length >= 3;
   const messageIsGood = isPositiveMessage(message);
-  const { rank, found, total, next, pangramCount, pangramFound } = beeProgress;
+  const { rank, found, total } = beeProgress;
 
   // Let players type on a physical keyboard
   const letters = [puzzle.center, ...outerLetters].map((l) => l.toLowerCase());
@@ -112,7 +112,7 @@ export default function SpellingBee({
             height: '8px',
             borderRadius: '999px',
             background: `${colors.textLight}22`,
-            margin: '8px 0',
+            margin: '8px 0 0',
             overflow: 'hidden',
           }}
         >
@@ -125,12 +125,6 @@ export default function SpellingBee({
               transition: 'width 0.3s ease',
             }}
           />
-        </div>
-        <div style={{ fontSize: '13px', fontWeight: '600', color: colors.textLight }}>
-          {next ? `Next: ${next.name} at ${next.at} words. ` : 'You reached the top rank! '}
-          {pangramFound
-            ? 'Pangram found!'
-            : `Hint: ${pangramCount === 1 ? '1 word uses' : `${pangramCount} words use`} all 7 letters.`}
         </div>
       </div>
 

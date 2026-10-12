@@ -85,6 +85,10 @@ This rewrites `src/data/beePuzzleList.js` with the letters, a center letter, and
 
 Players' saved puzzles must be one of the puzzles in the list. If you remove a puzzle, anyone halfway through it gets a new one.
 
+**Add a badge.** Add one line to `BADGES` in `src/data/rewards.js`: an id, name, icon, description, the stat it is measured by, and the target. The stats are listed in `src/lib/badgeStats.js`. For something new to count (say, a new kind of win), add a name to `counters` in `src/hooks/useProgress.js`, call `addCount('name')` where it happens, and expose it in `badgeStats.js`. Badges are awarded by one check in `src/hooks/useBadges.js`, so players who already qualify get a new badge the next time they open the site. The tests make sure every badge points at a real stat.
+
+**Points and bonuses.** Points per word come from `calculatePoints` in `src/hooks/useProgress.js`. Bonuses: 20 for a pangram (`PANGRAM_BONUS` in `useSpellingBee.js`), 25 for finishing a Word Search (`FINISH_BONUS` in `useWordSearch.js`), and for winning the daily Wordle 10 plus 5 per day of streak, up to 25 extra (`useWordle.js`).
+
 **Add a color theme.** Add the colors to `src/data/colorThemes.js` and its card to `VISUAL_THEMES` in `src/data/rewards.js`.
 
 ## The word list
