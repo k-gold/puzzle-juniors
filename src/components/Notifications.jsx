@@ -34,8 +34,9 @@ export default function Notifications({
         <div
           style={{
             position: 'fixed',
-            top: '120px',
-            right: '0',
+            top: 'calc(env(safe-area-inset-top) + 124px)',
+            right: '12px',
+            maxWidth: 'calc(100vw - 24px)',
             animation: 'badgeFlyIn 3s ease-out',
             pointerEvents: 'none',
             zIndex: 1001,
@@ -43,21 +44,20 @@ export default function Notifications({
         >
           <div
             style={{
-              background: `linear-gradient(135deg, ${colors.accent}30, ${colors.accent}20)`,
+              background: colors.surface,
               border: `3px solid ${colors.accent}`,
-              borderRadius: '16px',
-              padding: '20px 24px',
-              boxShadow: '0 8px 24px rgba(0,0,0,0.15)',
+              borderRadius: '20px',
+              padding: '14px 20px',
+              boxShadow: '0 8px 24px rgba(0,0,0,0.18)',
               display: 'flex',
               alignItems: 'center',
-              gap: '16px',
-              minWidth: '280px',
+              gap: '14px',
+              minWidth: '240px',
             }}
           >
             <div
               style={{
-                fontSize: '48px',
-                animation: 'pulse 1s ease-in-out infinite',
+                fontSize: '40px',
               }}
             >
               {newBadge.icon}

@@ -13,34 +13,28 @@ export default function WordSearch({
 }) {
   return (
     <>
-      {/* Game Header */}
-      <div
+      <h2
         style={{
+          fontSize: '13px',
+          fontWeight: '700',
+          letterSpacing: '0.08em',
+          textTransform: 'uppercase',
+          color: colors.textLight,
           textAlign: 'center',
-          marginBottom: '8px',
+          margin: '4px 0 12px',
         }}
       >
-        <h2
-          style={{
-            fontSize: '16px',
-            fontWeight: '600',
-            color: colors.textLight,
-            margin: 0,
-            padding: '4px 0',
-          }}
-        >
-          Find Words
-        </h2>
-      </div>
+        Find Words
+      </h2>
 
       {/* Word List - Target Words */}
       <div
         style={{
-          maxWidth: '420px',
-          margin: '0 auto 12px auto',
+          maxWidth: '460px',
+          margin: '0 auto 14px auto',
           display: 'flex',
           flexWrap: 'wrap',
-          gap: '6px',
+          gap: '8px',
           justifyContent: 'center',
         }}
       >
@@ -50,11 +44,11 @@ export default function WordSearch({
             <div
               key={idx}
               style={{
-                padding: '4px 10px',
-                borderRadius: '12px',
-                fontSize: '12px',
-                fontWeight: '600',
-                background: found ? `${colors.success}15` : `${colors.primary}10`,
+                padding: '6px 12px',
+                borderRadius: '999px',
+                fontSize: '13px',
+                fontWeight: '700',
+                background: found ? `${colors.success}1A` : `${colors.primary}12`,
                 color: found ? colors.success : colors.text,
                 textDecoration: found ? 'line-through' : 'none',
                 opacity: found ? 0.6 : 1,
@@ -69,9 +63,9 @@ export default function WordSearch({
 
       <div
         style={{
-          maxWidth: '420px',
+          maxWidth: '460px',
           width: '100%',
-          margin: '0 auto',
+          margin: '0 auto 20px',
           position: 'relative',
         }}
       >
@@ -86,7 +80,7 @@ export default function WordSearch({
               bottom: 0,
               background: 'rgba(255, 255, 255, 0.95)',
               backdropFilter: 'blur(8px)',
-              borderRadius: '16px',
+              borderRadius: '20px',
               display: 'flex',
               flexDirection: 'column',
               justifyContent: 'center',
@@ -160,8 +154,11 @@ export default function WordSearch({
           style={{
             display: 'grid',
             gridTemplateColumns: 'repeat(10, 1fr)',
-            gap: '4px',
-            marginBottom: '20px',
+            gap: '3px',
+            padding: '8px',
+            background: colors.surface,
+            borderRadius: '20px',
+            boxShadow: '0 1px 2px rgba(0,0,0,0.06), 0 6px 16px rgba(0,0,0,0.04)',
             userSelect: 'none',
             touchAction: 'none',
           }}
@@ -195,17 +192,16 @@ export default function WordSearch({
                     ? colors.success
                     : isCellSelected(rowIndex, colIndex)
                       ? colors.accent
-                      : colors.surface,
-                  borderRadius: '6px',
-                  fontSize: '14px',
-                  fontWeight: '700',
+                      : colors.background,
+                  borderRadius: '8px',
+                  fontSize: 'clamp(14px, 4.6vw, 22px)',
+                  fontWeight: '800',
                   color:
                     isCellInSolution(rowIndex, colIndex) || isCellSelected(rowIndex, colIndex)
                       ? 'white'
                       : colors.text,
                   cursor: 'pointer',
-                  transition: 'all 0.1s',
-                  boxShadow: '0 1px 2px rgba(0,0,0,0.1)',
+                  transition: 'background 0.1s',
                   touchAction: 'none',
                 }}
               >

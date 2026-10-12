@@ -32,3 +32,11 @@ export const generateSpellingBeePuzzle = () => {
   ];
   return puzzles[Math.floor(Math.random() * puzzles.length)];
 };
+
+// A playable puzzle has 7 distinct letters and its center is one of them.
+// Used to discard broken puzzles that an earlier version saved in a player's browser.
+export const isValidPuzzle = (p) =>
+  Boolean(p) &&
+  Array.isArray(p.letters) &&
+  new Set(p.letters).size === 7 &&
+  p.letters.includes(p.center);

@@ -18,77 +18,67 @@ export default function Wordle({
 }) {
   return (
     <>
-      {/* Game Header */}
-      <div
+      <h2
         style={{
+          fontSize: '13px',
+          fontWeight: '700',
+          letterSpacing: '0.08em',
+          textTransform: 'uppercase',
+          color: colors.textLight,
           textAlign: 'center',
-          marginBottom: '8px',
+          margin: '4px 0 12px',
         }}
       >
-        <h2
-          style={{
-            fontSize: '16px',
-            fontWeight: '600',
-            color: colors.textLight,
-            margin: 0,
-            padding: '4px 0',
-          }}
-        >
-          Guess the Word
-        </h2>
-      </div>
+        Guess the Word
+      </h2>
 
-      {/* Mode Toggle and Info */}
+      {/* Daily / Practice switch */}
       <div
         style={{
-          background: colors.surface,
-          padding: '20px',
+          maxWidth: '500px',
+          margin: '0 auto 14px',
+          display: 'flex',
+          gap: '4px',
+          padding: '4px',
+          background: `${colors.textLight}22`,
           borderRadius: '16px',
-          marginBottom: '16px',
-          boxShadow: '0 1px 3px rgba(0,0,0,0.1)',
         }}
       >
-        {/* Mode Toggle */}
-        <div style={{ display: 'flex', gap: '8px', marginBottom: '12px' }}>
-          <button
-            onClick={() => switchWordleMode('daily')}
-            style={{
-              flex: 1,
-              padding: '12px',
-              background: wordleMode === 'daily' ? colors.primary : colors.background,
-              color: wordleMode === 'daily' ? 'white' : colors.text,
-              border: `2px solid ${colors.primary}`,
-              borderRadius: '8px',
-              fontSize: '14px',
-              fontWeight: '600',
-              cursor: 'pointer',
-              transition: 'all 0.2s',
-            }}
-          >
-            <div>Daily</div>
-            {wordleMode === 'daily' && dailyStreak > 0 && (
-              <div style={{ fontSize: '12px', marginTop: '4px' }}>Streak: {dailyStreak}</div>
-            )}
-          </button>
-
-          <button
-            onClick={() => switchWordleMode('practice')}
-            style={{
-              flex: 1,
-              padding: '12px',
-              background: wordleMode === 'practice' ? colors.primary : colors.background,
-              color: wordleMode === 'practice' ? 'white' : colors.text,
-              border: `2px solid ${colors.primary}`,
-              borderRadius: '8px',
-              fontSize: '14px',
-              fontWeight: '600',
-              cursor: 'pointer',
-              transition: 'all 0.2s',
-            }}
-          >
-            Practice
-          </button>
-        </div>
+        {[
+          { id: 'daily', label: 'Daily' },
+          { id: 'practice', label: 'Practice' },
+        ].map((mode) => {
+          const active = wordleMode === mode.id;
+          return (
+            <button
+              key={mode.id}
+              onClick={() => switchWordleMode(mode.id)}
+              aria-pressed={active}
+              style={{
+                flex: 1,
+                padding: '10px 12px',
+                minHeight: '48px',
+                background: active ? colors.surface : 'transparent',
+                color: active ? colors.primary : colors.textLight,
+                border: 'none',
+                borderRadius: '12px',
+                fontSize: '15px',
+                fontWeight: '800',
+                cursor: 'pointer',
+                boxShadow: active ? '0 1px 3px rgba(0,0,0,0.12)' : 'none',
+                transition: 'all 0.2s',
+                touchAction: 'manipulation',
+              }}
+            >
+              <div>{mode.label}</div>
+              {mode.id === 'daily' && wordleMode === 'daily' && dailyStreak > 0 && (
+                <div style={{ fontSize: '12px', fontWeight: '700', marginTop: '2px' }}>
+                  Streak: {dailyStreak}
+                </div>
+              )}
+            </button>
+          );
+        })}
       </div>
 
       <div
@@ -96,15 +86,15 @@ export default function Wordle({
           maxWidth: '500px',
           width: '100%',
           margin: '0 auto',
-          paddingBottom: '240px', // Space for sticky keyboard (220px) + some buffer
+          paddingBottom: '230px', // Space for the sticky keyboard
         }}
       >
         <div
           style={{
             background: colors.surface,
-            borderRadius: '16px',
-            padding: '24px 16px',
-            boxShadow: '0 2px 8px rgba(0,0,0,0.08)',
+            borderRadius: '20px',
+            padding: '20px 12px',
+            boxShadow: '0 1px 2px rgba(0,0,0,0.06), 0 6px 16px rgba(0,0,0,0.04)',
           }}
         >
           {/* Error Message */}
@@ -134,8 +124,8 @@ export default function Wordle({
                   key={guessIdx}
                   style={{
                     display: 'flex',
-                    gap: '5px',
-                    marginBottom: '5px',
+                    gap: '6px',
+                    marginBottom: '6px',
                     justifyContent: 'center',
                   }}
                 >
@@ -149,17 +139,18 @@ export default function Wordle({
                       <div
                         key={letterIdx}
                         style={{
-                          width: '42px',
-                          height: '42px',
+                          width: 'min(58px, 15vw)',
+                          aspectRatio: '1',
+                          boxSizing: 'border-box',
                           background: bgColor,
-                          border: `2px solid ${guess ? 'transparent' : colors.textLight}`,
+                          border: `2px solid ${guess ? 'transparent' : `${colors.textLight}55`}`,
                           display: 'flex',
                           alignItems: 'center',
                           justifyContent: 'center',
-                          fontSize: '20px',
-                          fontWeight: '700',
+                          fontSize: 'clamp(22px, 7vw, 30px)',
+                          fontWeight: '800',
                           color: guess ? 'white' : colors.text,
-                          borderRadius: '8px',
+                          borderRadius: '12px',
                           transition: 'all 0.2s',
                         }}
                       >
@@ -179,7 +170,7 @@ export default function Wordle({
                 background: colors.success,
                 color: 'white',
                 padding: '16px',
-                borderRadius: '12px',
+                borderRadius: '16px',
                 textAlign: 'center',
                 marginBottom: '16px',
                 fontWeight: '700',
@@ -248,7 +239,7 @@ export default function Wordle({
                 background: colors.success,
                 color: 'white',
                 padding: '16px',
-                borderRadius: '12px',
+                borderRadius: '16px',
                 textAlign: 'center',
                 marginBottom: '16px',
                 fontWeight: '700',
@@ -287,7 +278,7 @@ export default function Wordle({
                 background: colors.error,
                 color: 'white',
                 padding: '16px',
-                borderRadius: '12px',
+                borderRadius: '16px',
                 textAlign: 'center',
                 marginBottom: '16px',
                 fontWeight: '700',
@@ -335,8 +326,8 @@ export default function Wordle({
             left: 0,
             right: 0,
             background: colors.surface,
-            padding: '8px',
-            boxShadow: '0 -2px 10px rgba(0,0,0,0.1)',
+            padding: '10px 6px calc(10px + env(safe-area-inset-bottom))',
+            boxShadow: '0 -2px 12px rgba(0,0,0,0.08)',
             zIndex: 150,
           }}
         >
@@ -346,7 +337,7 @@ export default function Wordle({
               margin: '0 auto',
               display: 'flex',
               flexDirection: 'column',
-              gap: '4px',
+              gap: '6px',
             }}
           >
             {[
@@ -358,7 +349,7 @@ export default function Wordle({
                 key={rowIdx}
                 style={{
                   display: 'flex',
-                  gap: '3px',
+                  gap: '5px',
                   justifyContent: 'center',
                 }}
               >
@@ -378,14 +369,15 @@ export default function Wordle({
                         background: bgColor,
                         color: 'white',
                         border: 'none',
-                        padding: key.length > 1 ? '10px 6px' : '10px 0',
-                        borderRadius: '5px',
-                        fontSize: key.length > 1 ? '10px' : '14px',
+                        height: '48px',
+                        padding: 0,
+                        borderRadius: '8px',
+                        fontSize: key.length > 1 ? '12px' : '17px',
                         cursor: 'pointer',
-                        fontWeight: '700',
-                        minWidth: key.length > 1 ? '48px' : '28px',
+                        fontWeight: '800',
+                        minWidth: 0,
                         flex: key.length > 1 ? '1.5' : '1',
-                        maxWidth: key.length > 1 ? '60px' : '38px',
+                        maxWidth: key.length > 1 ? '64px' : '42px',
                         transition: 'all 0.15s',
                         boxShadow: isWrongLetter
                           ? '0 2px 4px rgba(0,0,0,0.1)'

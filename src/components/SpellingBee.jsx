@@ -1,6 +1,16 @@
 import ShuffleIcon from './ShuffleIcon.jsx';
 import HexButton from './HexButton.jsx';
 
+const sectionLabel = (colors) => ({
+  fontSize: '13px',
+  fontWeight: '700',
+  letterSpacing: '0.08em',
+  textTransform: 'uppercase',
+  color: colors.textLight,
+  textAlign: 'center',
+  margin: '4px 0 0',
+});
+
 export default function SpellingBee({
   colors,
   puzzle,
@@ -14,145 +24,119 @@ export default function SpellingBee({
   handleLetterClick,
   outerLetters,
 }) {
+  const canSubmit = !isValidating && currentWord.length >= 3;
+  const messageIsGood = message.includes('Great') || message.includes('Checking');
+
+  // Honeycomb: two tiles on top, three in the middle (center letter in the middle), two below
+  const tile = (letter, isCenter = false) => ({ letter, isCenter });
+  const rows = [
+    [tile(outerLetters[0]), tile(outerLetters[1])],
+    [tile(outerLetters[2]), tile(puzzle.center, true), tile(outerLetters[3])],
+    [tile(outerLetters[4]), tile(outerLetters[5])],
+  ];
+
+  const controlButton = {
+    height: '56px',
+    borderRadius: '16px',
+    fontSize: '16px',
+    fontWeight: '700',
+    cursor: 'pointer',
+    touchAction: 'manipulation',
+    transition: 'transform 0.12s ease',
+  };
+  const press = {
+    onMouseDown: (e) => (e.currentTarget.style.transform = 'scale(0.97)'),
+    onMouseUp: (e) => (e.currentTarget.style.transform = 'scale(1)'),
+    onMouseLeave: (e) => (e.currentTarget.style.transform = 'scale(1)'),
+  };
+
   return (
     <>
-      {/* Game Header */}
-      <div
-        style={{
-          textAlign: 'center',
-          marginBottom: '8px',
-        }}
-      >
-        <h2
-          style={{
-            fontSize: '16px',
-            fontWeight: '600',
-            color: colors.textLight,
-            margin: 0,
-            padding: '4px 0',
-          }}
-        >
-          Letter Puzzle
-        </h2>
-      </div>
+      <h2 style={sectionLabel(colors)}>Letter Puzzle</h2>
 
-      {/* Main Game */}
       <div
         style={{
+          // Tile width scales with the screen; the gap between tiles stays fixed
+          '--hex': 'clamp(64px, 24vw, 96px)',
+          '--gap': '6px',
           maxWidth: '420px',
           width: '100%',
           margin: '0 auto',
-          flex: 1,
           display: 'flex',
           flexDirection: 'column',
           alignItems: 'center',
-          paddingTop: '20px',
+          paddingTop: '8px',
         }}
       >
-        {/* Message Display - Above word display */}
-        {message && (
-          <p
-            style={{
-              margin: '0 0 8px 0',
-              color:
-                message.includes('Great') || message.includes('Checking')
-                  ? colors.success
-                  : colors.error,
-              fontWeight: '600',
-              fontSize: '14px',
-              minHeight: '20px',
-            }}
-          >
-            {message}
-          </p>
-        )}
+        {/* Message area keeps its height so the board does not jump */}
+        <p
+          style={{
+            margin: '0 0 4px',
+            minHeight: '22px',
+            color: messageIsGood ? colors.success : colors.error,
+            fontWeight: '700',
+            fontSize: '15px',
+          }}
+          aria-live="polite"
+        >
+          {message}
+        </p>
 
-        {/* Current Word Display - Below message */}
+        {/* Current word */}
         <div
           style={{
-            fontSize: '32px',
-            fontWeight: '600',
+            fontSize: currentWord ? '36px' : '15px',
+            textAlign: 'center',
+            fontWeight: '800',
             color: currentWord ? colors.text : colors.textLight,
-            letterSpacing: '0.08em',
-            minHeight: '48px',
-            marginBottom: '24px',
+            letterSpacing: currentWord ? '0.08em' : '0',
+            minHeight: '56px',
+            display: 'flex',
+            alignItems: 'center',
+            marginBottom: '20px',
             textTransform: 'uppercase',
           }}
         >
-          {currentWord || '\u00A0'}
+          {currentWord || 'Tap letters to spell a word'}
         </div>
 
-        {/* Hexagon Grid - NYT Style */}
+        {/* Honeycomb tiles */}
         <div
           style={{
             display: 'flex',
             flexDirection: 'column',
             alignItems: 'center',
-            marginBottom: '24px',
-            gap: '8px',
+            marginBottom: '28px',
           }}
         >
-          {/* Top row - 2 letters */}
-          <div style={{ display: 'flex', gap: '8px' }}>
-            <HexButton
-              colors={colors}
-              letter={outerLetters[0]}
-              isCenter={false}
-              onClick={() => handleLetterClick(outerLetters[0])}
-            />
-            <HexButton
-              colors={colors}
-              letter={outerLetters[1]}
-              isCenter={false}
-              onClick={() => handleLetterClick(outerLetters[1])}
-            />
-          </div>
-
-          {/* Middle row - 3 letters (left, center, right) */}
-          <div style={{ display: 'flex', gap: '8px' }}>
-            <HexButton
-              colors={colors}
-              letter={outerLetters[2]}
-              isCenter={false}
-              onClick={() => handleLetterClick(outerLetters[2])}
-            />
-            <HexButton
-              colors={colors}
-              letter={puzzle.center}
-              isCenter={true}
-              onClick={() => handleLetterClick(puzzle.center)}
-            />
-            <HexButton
-              colors={colors}
-              letter={outerLetters[3]}
-              isCenter={false}
-              onClick={() => handleLetterClick(outerLetters[3])}
-            />
-          </div>
-
-          {/* Bottom row - 2 letters */}
-          <div style={{ display: 'flex', gap: '8px' }}>
-            <HexButton
-              colors={colors}
-              letter={outerLetters[4]}
-              isCenter={false}
-              onClick={() => handleLetterClick(outerLetters[4])}
-            />
-            <HexButton
-              colors={colors}
-              letter={outerLetters[5]}
-              isCenter={false}
-              onClick={() => handleLetterClick(outerLetters[5])}
-            />
-          </div>
+          {rows.map((row, rowIdx) => (
+            <div
+              key={rowIdx}
+              style={{
+                display: 'flex',
+                gap: 'var(--gap)',
+                // Rows tuck into each other to form the honeycomb
+                marginTop: rowIdx === 0 ? 0 : 'calc(var(--hex) * -0.2887 + var(--gap) * 0.866)',
+              }}
+            >
+              {row.map(({ letter, isCenter }, i) => (
+                <HexButton
+                  key={i}
+                  colors={colors}
+                  letter={letter}
+                  isCenter={isCenter}
+                  onClick={() => handleLetterClick(letter)}
+                />
+              ))}
+            </div>
+          ))}
         </div>
 
-        {/* Three Button Controls */}
+        {/* Controls */}
         <div
           style={{
             display: 'flex',
-            justifyContent: 'center',
-            gap: '12px',
+            gap: '10px',
             marginBottom: '24px',
             width: '100%',
             maxWidth: '360px',
@@ -161,117 +145,85 @@ export default function SpellingBee({
           <button
             onClick={() => setCurrentWord(currentWord.slice(0, -1))}
             style={{
+              ...controlButton,
               flex: 1,
-              padding: '14px',
               background: colors.surface,
               color: colors.text,
-              border: `2px solid ${colors.textLight}`,
-              borderRadius: '12px',
-              cursor: 'pointer',
-              fontSize: '14px',
-              fontWeight: '600',
-              touchAction: 'manipulation',
-              transition: 'all 0.15s ease',
+              border: `2px solid ${colors.textLight}55`,
             }}
-            onMouseDown={(e) => (e.currentTarget.style.transform = 'scale(0.97)')}
-            onMouseUp={(e) => (e.currentTarget.style.transform = 'scale(1)')}
+            {...press}
           >
             Delete
           </button>
           <button
             onClick={shuffleLetters}
+            aria-label="Shuffle letters"
             style={{
-              flex: 0.8,
-              padding: '14px',
+              ...controlButton,
+              width: '56px',
+              flex: 'none',
               background: colors.surface,
-              color: colors.text,
+              color: colors.primary,
               border: `2px solid ${colors.primary}`,
-              borderRadius: '12px',
-              cursor: 'pointer',
-              fontSize: '14px',
-              fontWeight: '600',
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
-              touchAction: 'manipulation',
-              transition: 'all 0.15s ease',
             }}
-            onMouseDown={(e) => (e.currentTarget.style.transform = 'scale(0.97)')}
-            onMouseUp={(e) => (e.currentTarget.style.transform = 'scale(1)')}
+            {...press}
           >
-            <ShuffleIcon size={18} />
+            <ShuffleIcon size={22} />
           </button>
           <button
             onClick={handleSubmit}
-            disabled={isValidating || currentWord.length < 3}
+            disabled={!canSubmit}
             style={{
-              flex: 1,
-              padding: '14px',
-              background:
-                isValidating || currentWord.length < 3 ? colors.textLight : colors.primary,
+              ...controlButton,
+              flex: 1.2,
+              background: canSubmit ? colors.primary : `${colors.textLight}66`,
               color: 'white',
               border: 'none',
-              borderRadius: '12px',
-              cursor: isValidating || currentWord.length < 3 ? 'not-allowed' : 'pointer',
-              fontSize: '14px',
-              fontWeight: '700',
-              boxShadow:
-                isValidating || currentWord.length < 3
-                  ? 'none'
-                  : '0 4px 12px rgba(99, 102, 241, 0.3)',
-              touchAction: 'manipulation',
-              transition: 'all 0.15s ease',
+              cursor: canSubmit ? 'pointer' : 'not-allowed',
+              boxShadow: canSubmit ? `0 4px 0 ${colors.primary}66` : 'none',
             }}
-            onMouseDown={(e) => {
-              if (!isValidating && currentWord.length >= 3) {
-                e.currentTarget.style.transform = 'scale(0.98)';
-              }
-            }}
-            onMouseUp={(e) => (e.currentTarget.style.transform = 'scale(1)')}
+            {...press}
           >
             {isValidating ? 'Checking...' : 'Enter'}
           </button>
         </div>
 
-        {/* Found Words */}
+        {/* Found words */}
         {foundWords.length > 0 && (
           <div
             style={{
+              width: '100%',
               background: colors.surface,
-              borderRadius: '16px',
-              padding: '20px',
-              boxShadow: '0 1px 3px rgba(0,0,0,0.1)',
+              borderRadius: '20px',
+              padding: '18px',
+              boxShadow: '0 1px 2px rgba(0,0,0,0.06), 0 6px 16px rgba(0,0,0,0.04)',
+              marginBottom: '16px',
             }}
           >
             <h3
               style={{
-                fontSize: '16px',
-                fontWeight: '700',
+                fontSize: '15px',
+                fontWeight: '800',
                 color: colors.text,
-                marginBottom: '12px',
-                marginTop: 0,
+                margin: '0 0 12px',
               }}
             >
               Words ({foundWords.length})
             </h3>
-            <div
-              style={{
-                display: 'flex',
-                flexWrap: 'wrap',
-                gap: '8px',
-              }}
-            >
-              {foundWords.map((word, i) => (
+            <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px' }}>
+              {foundWords.map((word) => (
                 <span
-                  key={i}
+                  key={word}
                   style={{
-                    padding: '6px 12px',
-                    background: colors.background,
+                    padding: '7px 14px',
+                    background: `${colors.primary}12`,
                     color: colors.text,
-                    borderRadius: '8px',
+                    borderRadius: '999px',
                     fontSize: '14px',
-                    fontWeight: '600',
-                    border: `1px solid ${colors.primary}20`,
+                    fontWeight: '700',
                   }}
                 >
                   {word}

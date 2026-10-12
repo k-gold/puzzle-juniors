@@ -1,33 +1,37 @@
-// Hexagon button component - properly proportioned
+// One honeycomb tile. Its size comes from the --hex CSS variable set by the parent,
+// so the whole grid scales with the screen.
+const HEX_SHAPE = 'polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%)';
+
 export default function HexButton({ letter, isCenter, onClick, colors }) {
   return (
-    <button
-      onClick={onClick}
-      style={{
-        width: '70px',
-        height: '70px',
-        background: isCenter ? colors.accent : colors.primary,
-        border: 'none',
-        borderRadius: '12px',
-        color: 'white',
-        fontSize: '28px',
-        fontWeight: '700',
-        cursor: 'pointer',
-        transition: 'all 0.15s ease',
-        boxShadow: isCenter
-          ? '0 4px 12px rgba(245, 158, 11, 0.3)'
-          : '0 4px 12px rgba(99, 102, 241, 0.2)',
-        touchAction: 'manipulation',
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center',
-      }}
-      onMouseDown={(e) => (e.currentTarget.style.transform = 'scale(0.95)')}
-      onMouseUp={(e) => (e.currentTarget.style.transform = 'scale(1)')}
-      onTouchStart={(e) => (e.currentTarget.style.transform = 'scale(0.95)')}
-      onTouchEnd={(e) => (e.currentTarget.style.transform = 'scale(1)')}
-    >
-      {letter}
-    </button>
+    // The shadow lives on this wrapper because clip-path would cut it off the button itself
+    <div style={{ filter: 'drop-shadow(0 4px 0 rgba(0, 0, 0, 0.16))' }}>
+      <button
+        onClick={onClick}
+        aria-label={`${isCenter ? 'Center letter ' : 'Letter '}${letter}`}
+        style={{
+          display: 'block',
+          width: 'var(--hex)',
+          aspectRatio: '1 / 1.1547',
+          background: isCenter ? colors.accent : colors.primary,
+          border: 'none',
+          padding: 0,
+          clipPath: HEX_SHAPE,
+          color: 'white',
+          fontSize: 'calc(var(--hex) * 0.4)',
+          fontWeight: '800',
+          cursor: 'pointer',
+          transition: 'transform 0.12s ease',
+          touchAction: 'manipulation',
+        }}
+        onMouseDown={(e) => (e.currentTarget.style.transform = 'scale(0.94)')}
+        onMouseUp={(e) => (e.currentTarget.style.transform = 'scale(1)')}
+        onMouseLeave={(e) => (e.currentTarget.style.transform = 'scale(1)')}
+        onTouchStart={(e) => (e.currentTarget.style.transform = 'scale(0.94)')}
+        onTouchEnd={(e) => (e.currentTarget.style.transform = 'scale(1)')}
+      >
+        {letter}
+      </button>
+    </div>
   );
 }

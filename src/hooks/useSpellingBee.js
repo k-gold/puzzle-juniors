@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { isValidWord } from '../lib/wordList.js';
-import { generateSpellingBeePuzzle } from '../data/spellingBeePuzzles.js';
+import { generateSpellingBeePuzzle, isValidPuzzle } from '../data/spellingBeePuzzles.js';
 
 export function useSpellingBee(savedState, progress) {
   const {
@@ -16,9 +16,13 @@ export function useSpellingBee(savedState, progress) {
   } = progress;
 
   // Spelling Bee state - start with random puzzle if no saved state
-  const [puzzle, setPuzzle] = useState(() => savedState?.puzzle || generateSpellingBeePuzzle());
+  // A saved puzzle that is not playable (an old bug) is replaced along with its found words.
+  const savedPuzzleOk = isValidPuzzle(savedState?.puzzle);
+  const [puzzle, setPuzzle] = useState(() =>
+    savedPuzzleOk ? savedState.puzzle : generateSpellingBeePuzzle(),
+  );
   const [currentWord, setCurrentWord] = useState('');
-  const [foundWords, setFoundWords] = useState(savedState?.foundWords || []);
+  const [foundWords, setFoundWords] = useState(savedPuzzleOk ? savedState?.foundWords || [] : []);
   const [message, setMessage] = useState('');
   const [isValidating, setIsValidating] = useState(false);
 

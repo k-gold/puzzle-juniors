@@ -191,11 +191,9 @@ export default function App() {
       `}</style>
 
       <div
+        className="app-shell"
         style={{
-          minHeight: '100vh',
           background: colors.background,
-          fontFamily:
-            '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif',
           paddingBottom: '20px',
           display: 'flex',
           flexDirection: 'column',

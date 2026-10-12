@@ -2,15 +2,15 @@
 // Define all color themes
 export const COLOR_THEMES = {
   classic: {
-    primary: '#6366F1', // Indigo
-    secondary: '#EC4899', // Pink
-    accent: '#F59E0B', // Amber
-    success: '#10B981', // Emerald
-    error: '#EF4444', // Red
-    background: '#F8FAFC', // Slate
+    primary: '#6D5BF6', // Violet
+    secondary: '#FF6FA5', // Pink
+    accent: '#F08A00', // Orange
+    success: '#0E9F6E', // Green
+    error: '#E5484D', // Red
+    background: '#FBF8F3', // Warm cream
     surface: '#FFFFFF', // White
-    text: '#1E293B', // Slate
-    textLight: '#64748B', // Slate
+    text: '#23262F', // Charcoal
+    textLight: '#6B7280', // Gray
   },
   ocean: {
     primary: '#0EA5E9', // Sky Blue

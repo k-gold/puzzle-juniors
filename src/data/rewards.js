@@ -28,7 +28,7 @@ export const WORD_SEARCH_THEMES = [
 ];
 
 export const VISUAL_THEMES = [
-  { id: 'classic', name: 'Classic', points: 0, colors: ['#6366F1', '#EC4899', '#F59E0B'] },
+  { id: 'classic', name: 'Classic', points: 0, colors: ['#6D5BF6', '#FF6FA5', '#F08A00'] },
   { id: 'ocean', name: 'Ocean Breeze', points: 200, colors: ['#0EA5E9', '#06B6D4', '#14B8A6'] },
   { id: 'forest', name: 'Forest Magic', points: 400, colors: ['#10B981', '#84CC16', '#22C55E'] },
   { id: 'sunset', name: 'Sunset Glow', points: 600, colors: ['#F97316', '#FB923C', '#FBBF24'] },

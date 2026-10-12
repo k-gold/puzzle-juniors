@@ -1,249 +1,173 @@
+const TABS = [
+  { id: 'spelling', label: 'Letters', icon: '/icons/spelling-bee.png' },
+  { id: 'wordsearch', label: 'Search', icon: '/icons/word-search.png' },
+  { id: 'wordle', label: 'Guess', icon: '/icons/wordle.png' },
+  { id: 'store', label: 'Rewards', icon: '/icons/store.png' },
+];
+
 export default function Header({
   colors,
   activeGame,
   setActiveGame,
   points,
-  newGame,
-  newWordSearch,
   wordleMode,
   switchWordleMode,
+  newGame,
+  newWordSearch,
   newWordle,
 }) {
+  const handleNewGame = () => {
+    if (activeGame === 'spelling') {
+      newGame();
+    } else if (activeGame === 'wordsearch') {
+      newWordSearch();
+    } else if (activeGame === 'wordle') {
+      // Always go to practice mode for new game
+      if (wordleMode !== 'practice') {
+        switchWordleMode('practice');
+      }
+      newWordle();
+    }
+  };
+
   return (
-    <>
-      {/* Header with Points and Game Mode Navigation */}
+    <header
+      style={{
+        background: colors.surface,
+        boxShadow: '0 1px 0 rgba(0,0,0,0.06), 0 6px 18px rgba(0,0,0,0.05)',
+        position: 'sticky',
+        top: 0,
+        zIndex: 100,
+        paddingTop: 'env(safe-area-inset-top)',
+      }}
+    >
+      {/* Top row: title, new game, points */}
       <div
         style={{
-          background: colors.surface,
-          boxShadow: '0 2px 8px rgba(0,0,0,0.08)',
-          position: 'sticky',
-          top: 0,
-          zIndex: 100,
+          maxWidth: '600px',
+          margin: '0 auto',
+          padding: '10px clamp(12px, 4vw, 16px) 6px',
+          display: 'flex',
+          alignItems: 'center',
+          gap: '10px',
         }}
       >
-        {/* Top Row: Title, New Game Button, and Points */}
-        <div
+        <h1
           style={{
-            maxWidth: '600px',
-            margin: '0 auto',
-            padding: '12px 16px',
-            display: 'flex',
-            justifyContent: 'space-between',
-            alignItems: 'center',
-            gap: '12px',
+            fontSize: 'clamp(16px, 5vw, 19px)',
+            fontWeight: '800',
+            letterSpacing: '-0.01em',
+            color: colors.text,
+            margin: 0,
+            flex: 1,
+            whiteSpace: 'nowrap',
           }}
         >
-          <h1
+          Puzzle Juniors
+        </h1>
+
+        {activeGame !== 'store' && (
+          <button
+            onClick={handleNewGame}
             style={{
-              fontSize: '20px',
+              minHeight: '40px',
+              padding: '0 clamp(10px, 3vw, 14px)',
+              background: `${colors.primary}14`,
+              color: colors.primary,
+              border: 'none',
+              borderRadius: '999px',
+              fontSize: '13px',
               fontWeight: '700',
-              color: colors.text,
-              margin: 0,
+              cursor: 'pointer',
+              whiteSpace: 'nowrap',
+              touchAction: 'manipulation',
             }}
           >
-            Puzzle Juniors
-          </h1>
+            New game
+          </button>
+        )}
 
-          <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-            {/* Dynamic New Game Button */}
-            {activeGame !== 'store' && (
-              <button
-                onClick={() => {
-                  if (activeGame === 'spelling') {
-                    newGame();
-                  } else if (activeGame === 'wordsearch') {
-                    newWordSearch();
-                  } else if (activeGame === 'wordle') {
-                    // Always go to practice mode for new game
-                    if (wordleMode !== 'practice') {
-                      switchWordleMode('practice');
-                    }
-                    newWordle();
-                  }
-                }}
-                style={{
-                  padding: '8px 16px',
-                  background: colors.primary,
-                  color: 'white',
-                  border: 'none',
-                  borderRadius: '12px',
-                  fontSize: '14px',
-                  fontWeight: '600',
-                  cursor: 'pointer',
-                  transition: 'all 0.2s',
-                  whiteSpace: 'nowrap',
-                }}
-              >
-                New Game
-              </button>
-            )}
-
-            {/* Points Display */}
-            <div
-              onClick={() => setActiveGame('store')}
-              style={{
-                display: 'flex',
-                alignItems: 'center',
-                gap: '8px',
-                background: `linear-gradient(135deg, ${colors.accent}20, ${colors.accent}10)`,
-                padding: '8px 16px',
-                borderRadius: '20px',
-                border: `2px solid ${colors.accent}`,
-                cursor: 'pointer',
-                transition: 'all 0.2s',
-              }}
-              onMouseEnter={(e) => (e.currentTarget.style.transform = 'scale(1.05)')}
-              onMouseLeave={(e) => (e.currentTarget.style.transform = 'scale(1)')}
-            >
-              <span
-                style={{
-                  fontSize: '20px',
-                }}
-              >
-                ⭐
-              </span>
-              <span
-                style={{
-                  fontSize: '20px',
-                  fontWeight: '700',
-                  color: colors.accent,
-                }}
-              >
-                {points}
-              </span>
-            </div>
-          </div>
-        </div>
-
-        {/* Bottom Row: Game Mode Icon Buttons */}
-        <div
+        <button
+          onClick={() => setActiveGame('store')}
+          aria-label={`${points} points. Open rewards`}
           style={{
-            maxWidth: '600px',
-            margin: '0 auto',
             display: 'flex',
-            borderTop: `1px solid ${colors.background}`,
-            padding: '8px 0',
+            alignItems: 'center',
+            gap: '6px',
+            background: `${colors.accent}1F`,
+            minHeight: '40px',
+            padding: '0 clamp(10px, 3vw, 12px)',
+            borderRadius: '999px',
+            border: 'none',
+            cursor: 'pointer',
+            touchAction: 'manipulation',
           }}
         >
-          {/* Spelling Bee Button */}
-          <button
-            onClick={() => setActiveGame('spelling')}
-            style={{
-              flex: 1,
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              padding: '8px',
-              background: 'transparent',
-              border: 'none',
-              cursor: 'pointer',
-              transition: 'all 0.2s ease',
-              borderBottom:
-                activeGame === 'spelling' ? `3px solid ${colors.primary}` : '3px solid transparent',
-            }}
-          >
-            <img
-              src="/icons/spelling-bee.png"
-              alt="Spelling Bee"
-              style={{
-                width: '32px',
-                height: '32px',
-                objectFit: 'contain',
-                filter: activeGame === 'spelling' ? 'none' : 'grayscale(100%) opacity(40%)',
-              }}
-            />
-          </button>
-
-          {/* Word Search Button */}
-          <button
-            onClick={() => setActiveGame('wordsearch')}
-            style={{
-              flex: 1,
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              padding: '8px',
-              background: 'transparent',
-              border: 'none',
-              cursor: 'pointer',
-              transition: 'all 0.2s ease',
-              borderBottom:
-                activeGame === 'wordsearch'
-                  ? `3px solid ${colors.primary}`
-                  : '3px solid transparent',
-            }}
-          >
-            <img
-              src="/icons/word-search.png"
-              alt="Word Search"
-              style={{
-                width: '32px',
-                height: '32px',
-                objectFit: 'contain',
-                filter: activeGame === 'wordsearch' ? 'none' : 'grayscale(100%) opacity(40%)',
-              }}
-            />
-          </button>
-
-          {/* Wordle Button */}
-          <button
-            onClick={() => setActiveGame('wordle')}
-            style={{
-              flex: 1,
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              padding: '8px',
-              background: 'transparent',
-              border: 'none',
-              cursor: 'pointer',
-              transition: 'all 0.2s ease',
-              borderBottom:
-                activeGame === 'wordle' ? `3px solid ${colors.primary}` : '3px solid transparent',
-            }}
-          >
-            <img
-              src="/icons/wordle.png"
-              alt="Wordle"
-              style={{
-                width: '32px',
-                height: '32px',
-                objectFit: 'contain',
-                filter: activeGame === 'wordle' ? 'none' : 'grayscale(100%) opacity(40%)',
-              }}
-            />
-          </button>
-
-          {/* Rewards Button */}
-          <button
-            onClick={() => setActiveGame('store')}
-            style={{
-              flex: 1,
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              padding: '8px',
-              background: 'transparent',
-              border: 'none',
-              cursor: 'pointer',
-              transition: 'all 0.2s ease',
-              borderBottom:
-                activeGame === 'store' ? `3px solid ${colors.primary}` : '3px solid transparent',
-            }}
-          >
-            <img
-              src="/icons/store.png"
-              alt="Rewards"
-              style={{
-                width: '32px',
-                height: '32px',
-                objectFit: 'contain',
-                filter: activeGame === 'store' ? 'none' : 'grayscale(100%) opacity(40%)',
-              }}
-            />
-          </button>
-        </div>
+          <span style={{ fontSize: '16px', lineHeight: 1 }} aria-hidden="true">
+            ⭐
+          </span>
+          <span style={{ fontSize: '16px', fontWeight: '800', color: colors.text }}>{points}</span>
+        </button>
       </div>
-    </>
+
+      {/* Game tabs */}
+      <nav
+        aria-label="Games"
+        style={{
+          maxWidth: '600px',
+          margin: '0 auto',
+          display: 'flex',
+          padding: '0 8px',
+        }}
+      >
+        {TABS.map((tab) => {
+          const active = activeGame === tab.id;
+          return (
+            <button
+              key={tab.id}
+              onClick={() => setActiveGame(tab.id)}
+              aria-current={active ? 'page' : undefined}
+              style={{
+                flex: 1,
+                display: 'flex',
+                flexDirection: 'column',
+                alignItems: 'center',
+                gap: '3px',
+                padding: '8px 4px 7px',
+                background: 'transparent',
+                border: 'none',
+                borderBottom: `3px solid ${active ? colors.primary : 'transparent'}`,
+                cursor: 'pointer',
+                touchAction: 'manipulation',
+                transition: 'border-color 0.2s ease',
+              }}
+            >
+              <img
+                src={tab.icon}
+                alt=""
+                width="28"
+                height="28"
+                style={{
+                  width: '28px',
+                  height: '28px',
+                  objectFit: 'contain',
+                  filter: active ? 'none' : 'grayscale(100%) opacity(55%)',
+                  transition: 'filter 0.2s ease',
+                }}
+              />
+              <span
+                style={{
+                  fontSize: '12px',
+                  fontWeight: '700',
+                  color: active ? colors.primary : colors.textLight,
+                }}
+              >
+                {tab.label}
+              </span>
+            </button>
+          );
+        })}
+      </nav>
+    </header>
   );
 }
