@@ -57,7 +57,7 @@ tests/                  Tests, run with node:test
 
 ## Common changes
 
-**Add a Wordle answer.** Add a four-letter uppercase word to `src/data/wordleWords.js`. The word must also be in `public/words.txt`, or the puzzle could not be won. The tests check both.
+**Add a Wordle answer.** Add a four-letter uppercase word to the end of `src/data/wordleWords.js`. The word must also be in `public/words.txt`, or the puzzle could not be won, and it must not already be in the list. The tests check all three. The daily puzzle picks its word by position in this list, so do not reorder or remove words that have already been used: that would change what players see on days they have already played.
 
 **Add a Word Search theme.** Add its words to `src/data/wordSearchWords.js` and its card (name, icon, points needed) to `WORD_SEARCH_THEMES` in `src/data/rewards.js`. Words must be 10 letters or fewer. The tests check that both lists match.
 

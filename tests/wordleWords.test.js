@@ -16,3 +16,8 @@ test('every Wordle answer is accepted as a guess (otherwise the puzzle is unwinn
   const missing = [...new Set(WORDLE_WORDS)].filter((w) => !dictionary.has(w.toLowerCase()));
   assert.deepEqual(missing, []);
 });
+
+test('no Wordle answer appears twice, so the daily puzzle never repeats within the list', () => {
+  const repeated = WORDLE_WORDS.filter((w, i) => WORDLE_WORDS.indexOf(w) !== i);
+  assert.deepEqual(repeated, []);
+});
