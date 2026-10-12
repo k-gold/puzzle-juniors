@@ -1,4 +1,4 @@
-import { RefreshCw } from 'lucide-react';
+import ShuffleIcon from './ShuffleIcon.jsx';
 import HexButton from './HexButton.jsx';
 
 export default function SpellingBee({
@@ -199,7 +199,7 @@ export default function SpellingBee({
             onMouseDown={(e) => (e.currentTarget.style.transform = 'scale(0.97)')}
             onMouseUp={(e) => (e.currentTarget.style.transform = 'scale(1)')}
           >
-            <RefreshCw size={18} />
+            <ShuffleIcon size={18} />
           </button>
           <button
             onClick={handleSubmit}

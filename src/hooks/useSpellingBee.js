@@ -16,7 +16,7 @@ export function useSpellingBee(savedState, progress) {
   } = progress;
 
   // Spelling Bee state - start with random puzzle if no saved state
-  const [puzzle, setPuzzle] = useState(savedState?.puzzle || generateSpellingBeePuzzle());
+  const [puzzle, setPuzzle] = useState(() => savedState?.puzzle || generateSpellingBeePuzzle());
   const [currentWord, setCurrentWord] = useState('');
   const [foundWords, setFoundWords] = useState(savedState?.foundWords || []);
   const [message, setMessage] = useState('');

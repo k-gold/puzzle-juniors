@@ -3,7 +3,9 @@ import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import { WORDLE_WORDS } from '../src/data/wordleWords.js';
 
-const dictionary = new Set(readFileSync(new URL('../public/words.txt', import.meta.url), 'utf8').split('\n'));
+const dictionary = new Set(
+  readFileSync(new URL('../public/words.txt', import.meta.url), 'utf8').split('\n'),
+);
 
 test('every Wordle answer is exactly 4 letters, A-Z', () => {
   const bad = WORDLE_WORDS.filter((w) => !/^[A-Z]{4}$/.test(w));
