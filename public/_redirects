@@ -1,0 +1,6 @@
+# Redirect old Netlify domain to custom domain
+https://kid-spelling-search.netlify.app/*  https://puzzlejuniors.com/:splat  301!
+http://kid-spelling-search.netlify.app/*   https://puzzlejuniors.com/:splat  301!
+
+# SPA fallback - all other routes go to index.html
+/*    /index.html   200
