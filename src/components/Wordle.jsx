@@ -1,3 +1,6 @@
+import { useEffect } from 'react';
+import { wordleStyle } from '../lib/wordleColors.js';
+
 export default function Wordle({
   colors,
   wordleMode,
@@ -13,9 +16,28 @@ export default function Wordle({
   switchWordleMode,
   shareWordleResults,
   newWordle,
-  getWordleLetterColor,
-  getKeyboardKeyColor,
+  getLetterStatus,
+  getKeyStatus,
+  colorBlindMode,
 }) {
+  // Let players type on a physical keyboard
+  useEffect(() => {
+    const onKeyDown = (e) => {
+      if (e.ctrlKey || e.metaKey || e.altKey) return;
+      let key = null;
+      if (/^[a-zA-Z]$/.test(e.key)) key = e.key.toUpperCase();
+      else if (e.key === 'Backspace') key = 'BACK';
+      else if (e.key === 'Enter' && !e.target.matches?.('button')) key = 'ENTER';
+      if (!key) return;
+      e.preventDefault();
+      // Typing means the player is using the keyboard for the game, not for a tapped button
+      if (key !== 'ENTER') document.activeElement?.blur?.();
+      handleWordleKey(key);
+    };
+    window.addEventListener('keydown', onKeyDown);
+    return () => window.removeEventListener('keydown', onKeyDown);
+  }, [handleWordleKey]);
+
   return (
     <>
       <h2
@@ -59,7 +81,7 @@ export default function Wordle({
                 padding: '10px 12px',
                 minHeight: '48px',
                 background: active ? colors.surface : 'transparent',
-                color: active ? colors.primary : colors.textLight,
+                color: active ? colors.primaryText : colors.textLight,
                 border: 'none',
                 borderRadius: '12px',
                 fontSize: '15px',
@@ -72,7 +94,13 @@ export default function Wordle({
             >
               <div>{mode.label}</div>
               {mode.id === 'daily' && wordleMode === 'daily' && dailyStreak > 0 && (
-                <div style={{ fontSize: '12px', fontWeight: '700', marginTop: '2px' }}>
+                <div
+                  style={{
+                    fontSize: '12px',
+                    fontWeight: '700',
+                    marginTop: '2px',
+                  }}
+                >
                   Streak: {dailyStreak}
                 </div>
               )}
@@ -100,9 +128,10 @@ export default function Wordle({
           {/* Error Message */}
           {wordleError && (
             <div
+              role="alert"
               style={{
                 textAlign: 'center',
-                color: colors.error,
+                color: colors.errorText,
                 fontWeight: '600',
                 fontSize: '14px',
                 marginBottom: '12px',
@@ -131,25 +160,29 @@ export default function Wordle({
                 >
                   {Array.from({ length: 4 }).map((_, letterIdx) => {
                     const letter = display[letterIdx] || '';
-                    const bgColor = guess
-                      ? getWordleLetterColor(letter, letterIdx, guess)
-                      : colors.background;
+                    const status = guess ? getLetterStatus(letterIdx, guess) : null;
+                    const tone = status ? wordleStyle(colors, status, colorBlindMode) : null;
 
                     return (
                       <div
                         key={letterIdx}
+                        aria-label={
+                          letter
+                            ? `${letter}${status ? `, ${status === 'absent' ? 'not in the word' : status === 'present' ? 'in the word, wrong spot' : 'correct'}` : ''}`
+                            : 'empty'
+                        }
                         style={{
                           width: 'min(58px, 15vw)',
                           aspectRatio: '1',
                           boxSizing: 'border-box',
-                          background: bgColor,
+                          background: tone ? tone.background : colors.background,
                           border: `2px solid ${guess ? 'transparent' : `${colors.textLight}55`}`,
                           display: 'flex',
                           alignItems: 'center',
                           justifyContent: 'center',
                           fontSize: 'clamp(22px, 7vw, 30px)',
                           fontWeight: '800',
-                          color: guess ? 'white' : colors.text,
+                          color: tone ? tone.color : colors.text,
                           borderRadius: '12px',
                           transition: 'all 0.2s',
                         }}
@@ -168,7 +201,7 @@ export default function Wordle({
             <div
               style={{
                 background: colors.success,
-                color: 'white',
+                color: colors.onSuccess,
                 padding: '16px',
                 borderRadius: '16px',
                 textAlign: 'center',
@@ -181,17 +214,28 @@ export default function Wordle({
               <div style={{ marginBottom: '12px' }}>
                 Great job! Puzzle #{dailyPuzzleNumber} complete!
               </div>
-              <div style={{ fontSize: '14px', marginBottom: '12px', fontWeight: '500' }}>
+              <div
+                style={{
+                  fontSize: '14px',
+                  marginBottom: '12px',
+                  fontWeight: '500',
+                }}
+              >
                 Come back tomorrow for #{dailyPuzzleNumber + 1}
               </div>
               <div
-                style={{ display: 'flex', gap: '8px', justifyContent: 'center', flexWrap: 'wrap' }}
+                style={{
+                  display: 'flex',
+                  gap: '8px',
+                  justifyContent: 'center',
+                  flexWrap: 'wrap',
+                }}
               >
                 <button
                   onClick={shareWordleResults}
                   style={{
                     background: 'white',
-                    color: colors.success,
+                    color: colors.successText,
                     border: 'none',
                     padding: '10px 20px',
                     borderRadius: '8px',
@@ -212,7 +256,7 @@ export default function Wordle({
                   onClick={() => switchWordleMode('practice')}
                   style={{
                     background: 'white',
-                    color: colors.success,
+                    color: colors.successText,
                     border: 'none',
                     padding: '10px 20px',
                     borderRadius: '8px',
@@ -237,7 +281,7 @@ export default function Wordle({
             <div
               style={{
                 background: colors.success,
-                color: 'white',
+                color: colors.onSuccess,
                 padding: '16px',
                 borderRadius: '16px',
                 textAlign: 'center',
@@ -252,7 +296,7 @@ export default function Wordle({
                 onClick={newWordle}
                 style={{
                   background: 'white',
-                  color: colors.success,
+                  color: colors.successText,
                   border: 'none',
                   padding: '10px 24px',
                   borderRadius: '8px',
@@ -276,7 +320,7 @@ export default function Wordle({
             <div
               style={{
                 background: colors.error,
-                color: 'white',
+                color: colors.onError,
                 padding: '16px',
                 borderRadius: '16px',
                 textAlign: 'center',
@@ -286,7 +330,11 @@ export default function Wordle({
                 boxShadow: '0 4px 12px rgba(0,0,0,0.15)',
               }}
             >
-              <div style={{ marginBottom: wordleMode === 'practice' ? '12px' : '0' }}>
+              <div
+                style={{
+                  marginBottom: wordleMode === 'practice' ? '12px' : '0',
+                }}
+              >
                 The word was: {wordleTarget}
               </div>
               {wordleMode === 'practice' && (
@@ -294,7 +342,7 @@ export default function Wordle({
                   onClick={newWordle}
                   style={{
                     background: 'white',
-                    color: colors.error,
+                    color: colors.errorText,
                     border: 'none',
                     padding: '10px 24px',
                     borderRadius: '8px',
@@ -354,20 +402,26 @@ export default function Wordle({
                 }}
               >
                 {row.map((key) => {
-                  // Get dynamic background color for letter keys
-                  const bgColor =
-                    key !== 'ENTER' && key !== 'BACK' ? getKeyboardKeyColor(key) : colors.primary;
-
-                  // Determine if key should be slightly faded (wrong letter)
-                  const isWrongLetter = bgColor === colors.textLight;
+                  const isLetter = key !== 'ENTER' && key !== 'BACK';
+                  const status = isLetter ? getKeyStatus(key) : 'unused';
+                  const tone = wordleStyle(colors, status, colorBlindMode);
 
                   return (
                     <button
                       key={key}
+                      aria-label={
+                        key === 'BACK'
+                          ? 'Delete'
+                          : key === 'ENTER'
+                            ? 'Enter'
+                            : status === 'unused'
+                              ? key
+                              : `${key}, ${status === 'absent' ? 'not in the word' : status === 'present' ? 'in the word' : 'correct'}`
+                      }
                       onClick={() => handleWordleKey(key)}
                       style={{
-                        background: bgColor,
-                        color: 'white',
+                        background: tone.background,
+                        color: tone.color,
                         border: 'none',
                         height: '48px',
                         padding: 0,
@@ -379,11 +433,8 @@ export default function Wordle({
                         flex: key.length > 1 ? '1.5' : '1',
                         maxWidth: key.length > 1 ? '64px' : '42px',
                         transition: 'all 0.15s',
-                        boxShadow: isWrongLetter
-                          ? '0 2px 4px rgba(0,0,0,0.1)'
-                          : '0 2px 6px rgba(0,0,0,0.15)',
+                        boxShadow: '0 2px 6px rgba(0,0,0,0.15)',
                         touchAction: 'manipulation',
-                        opacity: isWrongLetter ? 0.5 : 1,
                       }}
                       onMouseDown={(e) => (e.currentTarget.style.transform = 'scale(0.95)')}
                       onMouseUp={(e) => (e.currentTarget.style.transform = 'scale(1)')}

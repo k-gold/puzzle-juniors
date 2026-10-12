@@ -11,6 +11,7 @@ export default function Notifications({
       {/* Points Animation Popup */}
       {showPointsAnimation && (
         <div
+          role="status"
           style={{
             position: 'fixed',
             top: activeGame === 'spelling' ? '180px' : '50%',
@@ -18,7 +19,7 @@ export default function Notifications({
             transform: activeGame === 'spelling' ? 'translateX(-50%)' : 'translate(-50%, -50%)',
             fontSize: '56px',
             fontWeight: '700',
-            color: colors.success,
+            color: colors.successText,
             animation: 'pointsPop 1.5s ease-out',
             pointerEvents: 'none',
             zIndex: 1000,
@@ -41,6 +42,7 @@ export default function Notifications({
             pointerEvents: 'none',
             zIndex: 1001,
           }}
+          role="status"
         >
           <div
             style={{
@@ -67,7 +69,7 @@ export default function Notifications({
                 style={{
                   fontSize: '14px',
                   fontWeight: '600',
-                  color: colors.accent,
+                  color: colors.accentText,
                   marginBottom: '4px',
                 }}
               >

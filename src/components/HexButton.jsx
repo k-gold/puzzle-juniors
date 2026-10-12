@@ -17,7 +17,7 @@ export default function HexButton({ letter, isCenter, onClick, colors }) {
           border: 'none',
           padding: 0,
           clipPath: HEX_SHAPE,
-          color: 'white',
+          color: isCenter ? colors.onAccent : colors.onPrimary,
           fontSize: 'calc(var(--hex) * 0.4)',
           fontWeight: '800',
           cursor: 'pointer',

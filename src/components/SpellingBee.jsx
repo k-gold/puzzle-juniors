@@ -1,3 +1,4 @@
+import { useEffect } from 'react';
 import ShuffleIcon from './ShuffleIcon.jsx';
 import HexButton from './HexButton.jsx';
 
@@ -26,6 +27,32 @@ export default function SpellingBee({
 }) {
   const canSubmit = !isValidating && currentWord.length >= 3;
   const messageIsGood = message.includes('Great') || message.includes('Checking');
+
+  // Let players type on a physical keyboard
+  const letters = [puzzle.center, ...outerLetters].map((l) => l.toLowerCase());
+  useEffect(() => {
+    const onKeyDown = (e) => {
+      if (e.ctrlKey || e.metaKey || e.altKey) return;
+      // Typing means the player is using the keyboard for the game, not for a tapped button
+      if (e.key === 'Backspace' || (e.key.length === 1 && letters.includes(e.key.toLowerCase()))) {
+        document.activeElement?.blur?.();
+      }
+      if (e.key === 'Backspace') {
+        e.preventDefault();
+        setCurrentWord(currentWord.slice(0, -1));
+      } else if (e.key === 'Enter') {
+        // Enter on a focused button activates that button instead
+        if (e.target.matches?.('button') || !canSubmit) return;
+        e.preventDefault();
+        handleSubmit();
+      } else if (e.key.length === 1 && letters.includes(e.key.toLowerCase())) {
+        e.preventDefault();
+        handleLetterClick(e.key);
+      }
+    };
+    window.addEventListener('keydown', onKeyDown);
+    return () => window.removeEventListener('keydown', onKeyDown);
+  });
 
   // Honeycomb: two tiles on top, three in the middle (center letter in the middle), two below
   const tile = (letter, isCenter = false) => ({ letter, isCenter });
@@ -73,7 +100,7 @@ export default function SpellingBee({
           style={{
             margin: '0 0 4px',
             minHeight: '22px',
-            color: messageIsGood ? colors.success : colors.error,
+            color: messageIsGood ? colors.successText : colors.errorText,
             fontWeight: '700',
             fontSize: '15px',
           }}
@@ -97,7 +124,7 @@ export default function SpellingBee({
             textTransform: 'uppercase',
           }}
         >
-          {currentWord || 'Tap letters to spell a word'}
+          {currentWord || 'Tap or type letters to spell a word'}
         </div>
 
         {/* Honeycomb tiles */}
@@ -163,7 +190,7 @@ export default function SpellingBee({
               width: '56px',
               flex: 'none',
               background: colors.surface,
-              color: colors.primary,
+              color: colors.primaryText,
               border: `2px solid ${colors.primary}`,
               display: 'flex',
               alignItems: 'center',
@@ -179,8 +206,8 @@ export default function SpellingBee({
             style={{
               ...controlButton,
               flex: 1.2,
-              background: canSubmit ? colors.primary : `${colors.textLight}66`,
-              color: 'white',
+              background: canSubmit ? colors.primary : `${colors.textLight}22`,
+              color: canSubmit ? colors.onPrimary : colors.textLight,
               border: 'none',
               cursor: canSubmit ? 'pointer' : 'not-allowed',
               boxShadow: canSubmit ? `0 4px 0 ${colors.primary}66` : 'none',

@@ -23,10 +23,18 @@ export default function App() {
 
   // Kid-friendly color scheme, chosen from the unlocked visual themes
   const colors = COLOR_THEMES[progress.currentVisualTheme] || COLOR_THEMES.classic;
-  const wordle = useWordle(savedState, progress, colors);
+  const wordle = useWordle(savedState, progress);
 
   // Everything a screen might need. Each screen picks what it uses.
-  const ctx = { colors, activeGame, setActiveGame, ...progress, ...bee, ...wordSearch, ...wordle };
+  const ctx = {
+    colors,
+    activeGame,
+    setActiveGame,
+    ...progress,
+    ...bee,
+    ...wordSearch,
+    ...wordle,
+  };
 
   // Save state to localStorage whenever it changes
   const {
@@ -38,6 +46,7 @@ export default function App() {
     unlockedSpellingBee,
     unlockedVisualThemes,
     currentVisualTheme,
+    colorBlindMode,
     badges,
     unlockedAnimations,
     currentAnimation,
@@ -76,6 +85,7 @@ export default function App() {
       unlockedSpellingBee,
       unlockedVisualThemes,
       currentVisualTheme,
+      colorBlindMode,
       badges,
       unlockedAnimations,
       currentAnimation,
@@ -114,6 +124,7 @@ export default function App() {
     unlockedSpellingBee,
     unlockedVisualThemes,
     currentVisualTheme,
+    colorBlindMode,
     badges,
     unlockedAnimations,
     currentAnimation,

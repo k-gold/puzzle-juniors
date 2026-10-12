@@ -21,7 +21,14 @@ function Card({ colors, title, count, children }) {
           marginBottom: '14px',
         }}
       >
-        <h2 style={{ fontSize: '18px', fontWeight: '800', color: colors.text, margin: 0 }}>
+        <h2
+          style={{
+            fontSize: '18px',
+            fontWeight: '800',
+            color: colors.text,
+            margin: 0,
+          }}
+        >
           {title}
         </h2>
         {count && (
@@ -29,7 +36,7 @@ function Card({ colors, title, count, children }) {
             style={{
               fontSize: '13px',
               fontWeight: '800',
-              color: colors.primary,
+              color: colors.primaryText,
               background: `${colors.primary}14`,
               padding: '5px 12px',
               borderRadius: '999px',
@@ -58,7 +65,7 @@ function Tile({ colors, border, background, dimmed, disabled, onClick, label, ch
         padding: '12px 8px',
         minHeight: '92px',
         textAlign: 'center',
-        opacity: dimmed ? 0.55 : 1,
+        filter: dimmed ? 'grayscale(0.8)' : 'none',
         cursor: disabled ? 'default' : 'pointer',
         color: colors.text,
         display: 'flex',
@@ -75,7 +82,11 @@ function Tile({ colors, border, background, dimmed, disabled, onClick, label, ch
   );
 }
 
-const tileName = (colors) => ({ fontSize: '14px', fontWeight: '700', color: colors.text });
+const tileName = (colors) => ({
+  fontSize: '14px',
+  fontWeight: '700',
+  color: colors.text,
+});
 const tileStatus = (color) => ({ fontSize: '12px', fontWeight: '700', color });
 
 export default function Rewards({
@@ -93,6 +104,8 @@ export default function Rewards({
   badges,
   badgeTooltip,
   setBadgeTooltip,
+  colorBlindMode,
+  setColorBlindMode,
 }) {
   const gameTotals = [
     { label: 'Letter Puzzle', value: spellingPoints },
@@ -135,7 +148,14 @@ export default function Rewards({
             marginBottom: '14px',
           }}
         >
-          <h2 style={{ fontSize: '18px', fontWeight: '800', color: colors.text, margin: 0 }}>
+          <h2
+            style={{
+              fontSize: '18px',
+              fontWeight: '800',
+              color: colors.text,
+              margin: 0,
+            }}
+          >
             Points
           </h2>
           <div
@@ -153,7 +173,13 @@ export default function Rewards({
           </div>
         </div>
 
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '10px' }}>
+        <div
+          style={{
+            display: 'grid',
+            gridTemplateColumns: 'repeat(3, 1fr)',
+            gap: '10px',
+          }}
+        >
           {gameTotals.map((game) => (
             <div
               key={game.label}
@@ -174,7 +200,13 @@ export default function Rewards({
               >
                 {game.label}
               </div>
-              <div style={{ fontSize: '20px', fontWeight: '800', color: colors.primary }}>
+              <div
+                style={{
+                  fontSize: '20px',
+                  fontWeight: '800',
+                  color: colors.primaryText,
+                }}
+              >
                 {game.value}
               </div>
             </div>
@@ -224,7 +256,11 @@ export default function Rewards({
                   <span style={tileName(colors)}>{theme.name}</span>
                   <span
                     style={tileStatus(
-                      isUnlocked ? colors.success : canUnlock ? colors.primary : colors.textLight,
+                      isUnlocked
+                        ? colors.successText
+                        : canUnlock
+                          ? colors.primaryText
+                          : colors.textLight,
                     )}
                   >
                     {isUnlocked ? '✓' : canUnlock ? 'Tap!' : `${theme.points} pts`}
@@ -301,11 +337,11 @@ export default function Rewards({
                   </span>
                   <span style={tileName(colors)}>{theme.name}</span>
                   {isActive ? (
-                    <span style={tileStatus(colors.primary)}>Active ✓</span>
+                    <span style={tileStatus(colors.primaryText)}>Active ✓</span>
                   ) : isUnlocked ? (
-                    <span style={tileStatus(colors.success)}>Tap to use</span>
+                    <span style={tileStatus(colors.successText)}>Tap to use</span>
                   ) : (
-                    <span style={tileStatus(canUnlock ? colors.primary : colors.textLight)}>
+                    <span style={tileStatus(canUnlock ? colors.primaryText : colors.textLight)}>
                       {canUnlock ? 'Tap!' : `${theme.points} pts`}
                     </span>
                   )}
@@ -313,6 +349,42 @@ export default function Rewards({
               );
             })}
           </div>
+        </Card>
+
+        {/* Settings */}
+        <Card colors={colors} title="Settings">
+          <label
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: '12px',
+              minHeight: '44px',
+              fontSize: '15px',
+              fontWeight: '700',
+              color: colors.text,
+              cursor: 'pointer',
+            }}
+          >
+            <input
+              type="checkbox"
+              checked={colorBlindMode}
+              onChange={(e) => setColorBlindMode(e.target.checked)}
+              style={{ width: '24px', height: '24px', accentColor: colors.primary, flex: 'none' }}
+            />
+            <span>
+              Color-blind friendly colors
+              <span
+                style={{
+                  display: 'block',
+                  fontSize: '13px',
+                  fontWeight: '600',
+                  color: colors.textLight,
+                }}
+              >
+                Guess the Word uses blue and orange instead of green and yellow
+              </span>
+            </span>
+          </label>
         </Card>
 
         {/* Badges */}
@@ -341,7 +413,13 @@ export default function Rewards({
                   <span style={{ fontSize: '30px', lineHeight: 1 }} aria-hidden="true">
                     {badge.icon}
                   </span>
-                  <span style={{ ...tileName(colors), fontSize: '12px', lineHeight: 1.2 }}>
+                  <span
+                    style={{
+                      ...tileName(colors),
+                      fontSize: '12px',
+                      lineHeight: 1.2,
+                    }}
+                  >
                     {badge.name}
                   </span>
                 </Tile>

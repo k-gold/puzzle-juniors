@@ -36,6 +36,9 @@ export function useProgress(savedState) {
   const [wordleWins, setWordleWins] = useState(savedState?.wordleWins || 0);
   const [wordleStreak, setWordleStreak] = useState(savedState?.wordleStreak || 0);
 
+  // Accessibility: Wordle uses blue and orange instead of green and yellow
+  const [colorBlindMode, setColorBlindMode] = useState(savedState?.colorBlindMode === true);
+
   // Badge notification
   const [showBadgeNotification, setShowBadgeNotification] = useState(false);
   const [newBadge, setNewBadge] = useState(null);
@@ -107,6 +110,8 @@ export function useProgress(savedState) {
     unlockedVisualThemes,
     setUnlockedVisualThemes,
     currentVisualTheme,
+    colorBlindMode,
+    setColorBlindMode,
     setCurrentVisualTheme,
     badges,
     setBadges,

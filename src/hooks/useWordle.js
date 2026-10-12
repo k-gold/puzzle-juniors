@@ -2,8 +2,9 @@ import { useState, useEffect } from 'react';
 import { isValidWord } from '../lib/wordList.js';
 import { WORDLE_WORDS } from '../data/wordleWords.js';
 import { scoreGuess } from '../lib/wordleScoring.js';
+import { shareSquare } from '../lib/wordleColors.js';
 
-export function useWordle(savedState, progress, colors) {
+export function useWordle(savedState, progress) {
   const {
     points,
     badges,
@@ -17,6 +18,7 @@ export function useWordle(savedState, progress, colors) {
     setWordleStreak,
     awardPoints,
     awardBadge,
+    colorBlindMode,
   } = progress;
 
   // Mode state
@@ -314,10 +316,7 @@ export function useWordle(savedState, progress, colors) {
     // Generate emoji grid
     for (const guess of wordleGuesses) {
       for (let i = 0; i < guess.length; i++) {
-        const color = getWordleLetterColor(guess[i], i, guess);
-        if (color === colors.success) grid += '🟩';
-        else if (color === colors.accent) grid += '🟨';
-        else grid += '⬜';
+        grid += shareSquare(getLetterStatus(i, guess), colorBlindMode);
       }
       grid += '\n';
     }
@@ -374,17 +373,17 @@ export function useWordle(savedState, progress, colors) {
     }
   };
 
-  // Wordle: Get Letter Color (handles duplicate letters correctly)
-  const getWordleLetterColor = (letter, index, guess) => {
+  // Wordle: status of one letter in a guess ('correct' | 'present' | 'absent')
+  const getLetterStatus = (index, guess) => {
     const result = scoreGuess(guess, wordleTarget)[index];
-    if (result === 'green') return colors.success;
-    if (result === 'yellow') return colors.accent;
-    return colors.textLight;
+    if (result === 'green') return 'correct';
+    if (result === 'yellow') return 'present';
+    return 'absent';
   };
 
   // Wordle: Get keyboard key color based on all previous guesses
-  const getKeyboardKeyColor = (key) => {
-    if (!wordleGuesses.length) return colors.primary; // Default color if no guesses yet
+  const getKeyStatus = (key) => {
+    if (!wordleGuesses.length) return 'unused';
 
     let keyState = 'unused'; // unused, wrong, present, correct
 
@@ -407,16 +406,7 @@ export function useWordle(savedState, progress, colors) {
       if (keyState === 'correct') break; // No need to check other guesses
     }
 
-    switch (keyState) {
-      case 'correct':
-        return colors.success;
-      case 'present':
-        return colors.accent;
-      case 'wrong':
-        return colors.textLight;
-      default:
-        return colors.primary;
-    }
+    return keyState === 'wrong' ? 'absent' : keyState;
   };
 
   return {
@@ -456,7 +446,7 @@ export function useWordle(savedState, progress, colors) {
     switchWordleMode,
     shareWordleResults,
     newWordle,
-    getWordleLetterColor,
-    getKeyboardKeyColor,
+    getLetterStatus,
+    getKeyStatus,
   };
 }

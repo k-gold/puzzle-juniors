@@ -73,7 +73,7 @@ export default function Header({
               minHeight: '40px',
               padding: '0 clamp(10px, 3vw, 14px)',
               background: `${colors.primary}14`,
-              color: colors.primary,
+              color: colors.primaryText,
               border: 'none',
               borderRadius: '999px',
               fontSize: '13px',
@@ -159,7 +159,7 @@ export default function Header({
                 style={{
                   fontSize: '12px',
                   fontWeight: '700',
-                  color: active ? colors.primary : colors.textLight,
+                  color: active ? colors.primaryText : colors.textLight,
                 }}
               >
                 {tab.label}

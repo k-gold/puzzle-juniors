@@ -1,8 +1,13 @@
+import { useState } from 'react';
+
 export default function WordSearch({
   colors,
   wordSearchPuzzle,
   wsFoundWords,
   isSelecting,
+  setIsSelecting,
+  wsSelectedCells,
+  setWsSelectedCells,
   handleCellMouseDown,
   handleCellMouseEnter,
   handleCellMouseUp,
@@ -11,6 +16,37 @@ export default function WordSearch({
   isCellInSolution,
   newWordSearch,
 }) {
+  // Keyboard play: a cursor moves over the grid. Space starts a word, arrows stretch it,
+  // Space again submits it, Escape cancels.
+  const [cursor, setCursor] = useState({ row: 0, col: 0 });
+  const [gridFocused, setGridFocused] = useState(false);
+  const size = wordSearchPuzzle.grid.length;
+
+  const onGridKeyDown = (e) => {
+    const moves = { ArrowUp: [-1, 0], ArrowDown: [1, 0], ArrowLeft: [0, -1], ArrowRight: [0, 1] };
+    const clamp = (n) => Math.max(0, Math.min(size - 1, n));
+    if (moves[e.key]) {
+      e.preventDefault();
+      const row = clamp(cursor.row + moves[e.key][0]);
+      const col = clamp(cursor.col + moves[e.key][1]);
+      setCursor({ row, col });
+      handleCellMouseEnter(row, col);
+    } else if (e.key === ' ' || e.key === 'Enter') {
+      e.preventDefault();
+      if (!isSelecting) {
+        handleCellMouseDown(cursor.row, cursor.col);
+      } else if (wsSelectedCells.length > 1) {
+        handleCellMouseUp();
+      } else {
+        setWsSelectedCells([]);
+        setIsSelecting(false);
+      }
+    } else if (e.key === 'Escape') {
+      setWsSelectedCells([]);
+      setIsSelecting(false);
+    }
+  };
+
   return (
     <>
       <h2
@@ -49,9 +85,8 @@ export default function WordSearch({
                 fontSize: '13px',
                 fontWeight: '700',
                 background: found ? `${colors.success}1A` : `${colors.primary}12`,
-                color: found ? colors.success : colors.text,
+                color: found ? colors.successText : colors.text,
                 textDecoration: found ? 'line-through' : 'none',
-                opacity: found ? 0.6 : 1,
                 transition: 'all 0.3s',
               }}
             >
@@ -102,7 +137,7 @@ export default function WordSearch({
               style={{
                 fontSize: '28px',
                 fontWeight: '700',
-                color: colors.success,
+                color: colors.successText,
                 marginBottom: '8px',
                 animation: 'slideUp 0.6s ease-out',
               }}
@@ -124,7 +159,7 @@ export default function WordSearch({
               style={{
                 padding: '16px 32px',
                 background: colors.success,
-                color: 'white',
+                color: colors.onSuccess,
                 border: 'none',
                 borderRadius: '12px',
                 cursor: 'pointer',
@@ -151,6 +186,12 @@ export default function WordSearch({
 
         {/* Grid */}
         <div
+          tabIndex={0}
+          role="group"
+          aria-label="Word search grid. Arrow keys move, space starts and ends a word, escape cancels."
+          onKeyDown={onGridKeyDown}
+          onFocus={() => setGridFocused(true)}
+          onBlur={() => setGridFocused(false)}
           style={{
             display: 'grid',
             gridTemplateColumns: 'repeat(10, 1fr)',
@@ -170,6 +211,12 @@ export default function WordSearch({
           onTouchMove={handleTouchMove}
           onTouchEnd={handleCellMouseUp}
         >
+          <div className="sr-only" aria-live="polite">
+            {gridFocused &&
+              `Row ${cursor.row + 1}, column ${cursor.col + 1}, ${wordSearchPuzzle.grid[cursor.row][cursor.col]}${
+                isCellSelected(cursor.row, cursor.col) ? ', selected' : ''
+              }`}
+          </div>
           {wordSearchPuzzle.grid.map((row, rowIndex) =>
             row.map((cell, colIndex) => (
               <div
@@ -196,11 +243,17 @@ export default function WordSearch({
                   borderRadius: '8px',
                   fontSize: 'clamp(14px, 4.6vw, 22px)',
                   fontWeight: '800',
-                  color:
-                    isCellInSolution(rowIndex, colIndex) || isCellSelected(rowIndex, colIndex)
-                      ? 'white'
+                  color: isCellInSolution(rowIndex, colIndex)
+                    ? colors.onSuccess
+                    : isCellSelected(rowIndex, colIndex)
+                      ? colors.onAccent
                       : colors.text,
                   cursor: 'pointer',
+                  outline:
+                    gridFocused && cursor.row === rowIndex && cursor.col === colIndex
+                      ? `3px solid ${colors.text}`
+                      : 'none',
+                  outlineOffset: '-3px',
                   transition: 'background 0.1s',
                   touchAction: 'none',
                 }}

@@ -1,6 +1,8 @@
+import { readableOn, ensureContrast, fillColor } from '../lib/color.js';
+
 // Kid-friendly, clean, cohesive color scheme
 // Define all color themes
-export const COLOR_THEMES = {
+const THEMES = {
   classic: {
     primary: '#6D5BF6', // Violet
     secondary: '#FF6FA5', // Pink
@@ -134,3 +136,25 @@ export const COLOR_THEMES = {
     textLight: '#0F766E',
   },
 };
+
+// Adds the colors that keep text readable on every theme:
+//   X          primary/accent/success/error are darkened only if no text color would read on them
+//   onX        text color to put on a surface painted with color X (white or dark)
+//   xText      color X darkened just enough to be used as text on the page background
+const withReadableColors = (theme) => {
+  const derived = { ...theme };
+  for (const key of ['primary', 'accent', 'success', 'error']) {
+    derived[key] = fillColor(theme[key]);
+  }
+  for (const key of ['primary', 'accent', 'success', 'error', 'textLight']) {
+    derived['on' + key[0].toUpperCase() + key.slice(1)] = readableOn(derived[key]);
+  }
+  for (const key of ['primary', 'accent', 'success', 'error']) {
+    derived[key + 'Text'] = ensureContrast(derived[key], [theme.surface, theme.background]);
+  }
+  return derived;
+};
+
+export const COLOR_THEMES = Object.fromEntries(
+  Object.entries(THEMES).map(([name, theme]) => [name, withReadableColors(theme)]),
+);
