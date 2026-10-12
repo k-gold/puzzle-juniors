@@ -38,6 +38,18 @@ Pull requests get a Deploy Preview, which is a separate web address for trying a
 
 - `VITE_GA_ID`: the Google Analytics measurement ID. If it is not set, analytics is not loaded. Set it for production deploys only, so previews and local runs are not tracked.
 
+### Before you push
+
+Pushing to `main` publishes the site, so run these first. They are the same checks Netlify runs.
+
+```
+npm run lint
+npm test
+npm run build
+```
+
+The tests include a smoke test that renders every screen, so a change that breaks a screen fails the build before it reaches players.
+
 ## Project layout
 
 ```
@@ -60,7 +72,7 @@ tests/                  Tests, run with node:test
 
 **Add a Wordle answer.** Add a four-letter uppercase word to the end of `src/data/wordleWords.js`. The word must also be in `public/words.txt`, or the puzzle could not be won, and it must not already be in the list. The tests check all three. The daily puzzle picks its word by position in this list, so do not reorder or remove words that have already been used: that would change what players see on days they have already played.
 
-**Add a Word Search theme.** Add its words to `src/data/wordSearchWords.js` and its card (name, icon, points needed) to `WORD_SEARCH_THEMES` in `src/data/rewards.js`. Words must be 10 letters or fewer. The tests check that both lists match.
+**Add a Word Search theme.** Add its words to `src/data/wordSearchWords.js` and its card (name, icon, points needed) to `WORD_SEARCH_THEMES` in `src/data/rewards.js`. Themes unlock by themselves when a player's points reach the number on the card. Words must be 10 letters or fewer. The tests check that both lists match.
 
 **Add a Letter Puzzle.** Puzzles are generated, not typed by hand. Add a 7-letter word that has seven different letters to the `PANGRAMS` list in `scripts/build-bee-puzzles.mjs`, then run:
 

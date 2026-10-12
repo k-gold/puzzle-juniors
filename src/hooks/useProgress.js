@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { WORD_SEARCH_THEMES } from '../data/rewards.js';
 
 export function useProgress(savedState) {
   // Points system
@@ -10,12 +11,8 @@ export function useProgress(savedState) {
   const [animatedPoints, setAnimatedPoints] = useState(0);
 
   // Unlockables state
-  const [unlockedThemes, setUnlockedThemes] = useState(
-    savedState?.unlockedThemes || ['space', 'ocean', 'forest'],
-  ); // Starting themes
-  const [unlockedSpellingBee, setUnlockedSpellingBee] = useState(
-    savedState?.unlockedSpellingBee || [0, 1, 2],
-  ); // Starting puzzles (indices)
+  // Word Search themes unlock by themselves as points are earned (nothing is spent)
+  const unlockedThemes = WORD_SEARCH_THEMES.filter((t) => points >= t.points).map((t) => t.id);
   const [unlockedVisualThemes, setUnlockedVisualThemes] = useState(
     savedState?.unlockedVisualThemes || ['classic'],
   ); // Starting visual theme
@@ -23,12 +20,6 @@ export function useProgress(savedState) {
     savedState?.currentVisualTheme || 'classic',
   );
   const [badges, setBadges] = useState(savedState?.badges || ['first-word', 'getting-started']); // Starting badges
-  const [unlockedAnimations, setUnlockedAnimations] = useState(
-    savedState?.unlockedAnimations || ['basic-sparkle'],
-  ); // Starting animation
-  const [currentAnimation, setCurrentAnimation] = useState(
-    savedState?.currentAnimation || 'basic-sparkle',
-  );
   const [totalWordsFound, setTotalWordsFound] = useState(savedState?.totalWordsFound || 0);
   const [gamesCompleted, setGamesCompleted] = useState(
     savedState?.gamesCompleted || { spelling: 0, wordsearch: 0, wordle: 0 },
@@ -104,9 +95,6 @@ export function useProgress(savedState) {
     animatedPoints,
     setAnimatedPoints,
     unlockedThemes,
-    setUnlockedThemes,
-    unlockedSpellingBee,
-    setUnlockedSpellingBee,
     unlockedVisualThemes,
     setUnlockedVisualThemes,
     currentVisualTheme,
@@ -115,10 +103,6 @@ export function useProgress(savedState) {
     setCurrentVisualTheme,
     badges,
     setBadges,
-    unlockedAnimations,
-    setUnlockedAnimations,
-    currentAnimation,
-    setCurrentAnimation,
     totalWordsFound,
     setTotalWordsFound,
     gamesCompleted,

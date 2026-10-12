@@ -374,7 +374,7 @@ export default function Wordle({
             left: 0,
             right: 0,
             background: colors.surface,
-            padding: '10px 6px calc(10px + env(safe-area-inset-bottom))',
+            padding: '6px 3px calc(8px + env(safe-area-inset-bottom))',
             boxShadow: '0 -2px 12px rgba(0,0,0,0.08)',
             zIndex: 150,
           }}
@@ -385,7 +385,6 @@ export default function Wordle({
               margin: '0 auto',
               display: 'flex',
               flexDirection: 'column',
-              gap: '6px',
             }}
           >
             {[
@@ -397,7 +396,6 @@ export default function Wordle({
                 key={rowIdx}
                 style={{
                   display: 'flex',
-                  gap: '5px',
                   justifyContent: 'center',
                 }}
               >
@@ -419,29 +417,43 @@ export default function Wordle({
                               : `${key}, ${status === 'absent' ? 'not in the word' : status === 'present' ? 'in the word' : 'correct'}`
                       }
                       onClick={() => handleWordleKey(key)}
+                      // The button is the tap target and fills its whole cell, including the
+                      // small gaps between keys. The colored key is drawn inside it.
                       style={{
-                        background: tone.background,
-                        color: tone.color,
+                        background: 'transparent',
                         border: 'none',
-                        height: '48px',
-                        padding: 0,
-                        borderRadius: '8px',
-                        fontSize: key.length > 1 ? '12px' : '17px',
+                        height: '54px',
+                        padding: '3px 2.5px',
                         cursor: 'pointer',
-                        fontWeight: '800',
                         minWidth: 0,
                         flex: key.length > 1 ? '1.5' : '1',
-                        maxWidth: key.length > 1 ? '64px' : '42px',
-                        transition: 'all 0.15s',
-                        boxShadow: '0 2px 6px rgba(0,0,0,0.15)',
+                        maxWidth: key.length > 1 ? '68px' : '46px',
                         touchAction: 'manipulation',
                       }}
                       onMouseDown={(e) => (e.currentTarget.style.transform = 'scale(0.95)')}
                       onMouseUp={(e) => (e.currentTarget.style.transform = 'scale(1)')}
+                      onMouseLeave={(e) => (e.currentTarget.style.transform = 'scale(1)')}
                       onTouchStart={(e) => (e.currentTarget.style.transform = 'scale(0.95)')}
                       onTouchEnd={(e) => (e.currentTarget.style.transform = 'scale(1)')}
                     >
-                      {key === 'BACK' ? '⌫' : key}
+                      <span
+                        style={{
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                          width: '100%',
+                          height: '100%',
+                          background: tone.background,
+                          color: tone.color,
+                          borderRadius: '8px',
+                          fontSize: key.length > 1 ? '12px' : '17px',
+                          fontWeight: '800',
+                          boxShadow: '0 2px 6px rgba(0,0,0,0.15)',
+                          transition: 'background 0.15s',
+                        }}
+                      >
+                        {key === 'BACK' ? '⌫' : key}
+                      </span>
                     </button>
                   );
                 })}

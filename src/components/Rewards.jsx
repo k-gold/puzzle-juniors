@@ -96,7 +96,6 @@ export default function Rewards({
   wordSearchPoints,
   wordlePoints,
   unlockedThemes,
-  setUnlockedThemes,
   unlockedVisualThemes,
   setUnlockedVisualThemes,
   currentVisualTheme,
@@ -230,40 +229,23 @@ export default function Rewards({
           >
             {WORD_SEARCH_THEMES.map((theme) => {
               const isUnlocked = unlockedThemes.includes(theme.id);
-              const canUnlock = points >= theme.points && !isUnlocked;
-              const status = isUnlocked ? 'unlocked' : canUnlock ? 'tap to unlock' : 'locked';
 
               return (
                 <Tile
                   key={theme.id}
                   colors={colors}
-                  label={`${theme.name}, ${status}`}
+                  label={`${theme.name}, ${isUnlocked ? 'unlocked' : `locked, ${theme.points} points`}`}
                   background={isUnlocked ? `${colors.success}18` : colors.background}
-                  border={
-                    isUnlocked ? colors.success : canUnlock ? colors.primary : colors.background
-                  }
-                  dimmed={!isUnlocked && !canUnlock}
-                  disabled={!canUnlock}
-                  onClick={() => {
-                    if (canUnlock) {
-                      setUnlockedThemes([...unlockedThemes, theme.id]);
-                    }
-                  }}
+                  border={isUnlocked ? colors.success : colors.background}
+                  dimmed={!isUnlocked}
+                  disabled
                 >
                   <span style={{ fontSize: '30px', lineHeight: 1 }} aria-hidden="true">
                     {theme.icon}
                   </span>
                   <span style={tileName(colors)}>{theme.name}</span>
-                  <span
-                    style={tileStatus(
-                      isUnlocked
-                        ? colors.successText
-                        : canUnlock
-                          ? colors.primaryText
-                          : colors.textLight,
-                    )}
-                  >
-                    {isUnlocked ? '✓' : canUnlock ? 'Tap!' : `${theme.points} pts`}
+                  <span style={tileStatus(isUnlocked ? colors.successText : colors.textLight)}>
+                    {isUnlocked ? '✓' : `${theme.points} pts`}
                   </span>
                 </Tile>
               );

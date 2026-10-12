@@ -17,9 +17,7 @@ export function useWordSearch(savedState, progress) {
 
   // Word Search state - start with random puzzle if no saved state
   const [wordSearchPuzzle, setWordSearchPuzzle] = useState(
-    () =>
-      savedState?.wordSearchPuzzle ||
-      generateWordSearchPuzzle(savedState?.unlockedThemes || ['space', 'ocean', 'forest']),
+    () => savedState?.wordSearchPuzzle || generateWordSearchPuzzle(unlockedThemes),
   );
   const [wsFoundWords, setWsFoundWords] = useState(savedState?.wsFoundWords || []);
   const [wsSelectedCells, setWsSelectedCells] = useState([]);
@@ -194,7 +192,10 @@ export function useWordSearch(savedState, progress) {
     }
 
     // Check combo-master (played all 3 games)
-    const updatedCompleted = { ...gamesCompleted, wordsearch: newGamesCompleted };
+    const updatedCompleted = {
+      ...gamesCompleted,
+      wordsearch: newGamesCompleted,
+    };
     if (
       updatedCompleted.spelling >= 1 &&
       updatedCompleted.wordsearch >= 1 &&
