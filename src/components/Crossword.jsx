@@ -1,7 +1,21 @@
 import { useEffect } from 'react';
 import { cellKey, CROSSWORD_FINISH_BONUS } from '../lib/crossword.js';
+import CrosswordPrintSheet from './CrosswordPrintSheet.jsx';
 
+const ARROWS = { ArrowUp: [-1, 0], ArrowDown: [1, 0], ArrowLeft: [0, -1], ArrowRight: [0, 1] };
 const KEY_ROWS = ['QWERTYUIOP', 'ASDFGHJKL', 'ZXCVBNM'];
+const arrowButton = (colors) => ({
+  width: '44px',
+  flexShrink: 0,
+  background: `${colors.primary}14`,
+  color: colors.primaryText,
+  border: 'none',
+  borderRadius: '12px',
+  fontSize: '28px',
+  fontWeight: '700',
+  cursor: 'pointer',
+  touchAction: 'manipulation',
+});
 const label = (entry) => `${entry.number} ${entry.dir === 'across' ? 'Across' : 'Down'}`;
 
 export default function Crossword({
@@ -18,6 +32,8 @@ export default function Crossword({
   selectCrosswordEntry,
   typeCrosswordLetter,
   crosswordBackspace,
+  goToCrosswordClue,
+  moveCrosswordCell,
   newCrossword,
 }) {
   // Let players type on a physical keyboard
@@ -31,11 +47,14 @@ export default function Crossword({
       } else if (e.key === 'Backspace') {
         e.preventDefault();
         crosswordBackspace();
+      } else if (ARROWS[e.key]) {
+        e.preventDefault();
+        moveCrosswordCell(...ARROWS[e.key]);
       }
     };
     window.addEventListener('keydown', onKeyDown);
     return () => window.removeEventListener('keydown', onKeyDown);
-  }, [typeCrosswordLetter, crosswordBackspace]);
+  }, [typeCrosswordLetter, crosswordBackspace, moveCrosswordCell]);
 
   const solvedCells = new Set(
     crossword.entries
@@ -123,27 +142,48 @@ export default function Crossword({
 
       <div style={{ maxWidth: '500px', margin: '0 auto', paddingBottom: '8px' }}>
         <div style={card}>
-          {/* The clue for the word being worked on */}
-          <div
-            role="status"
-            aria-live="polite"
-            style={{
-              minHeight: '44px',
-              marginBottom: '10px',
-              padding: '8px 12px',
-              background: `${colors.primary}14`,
-              borderRadius: '12px',
-              fontSize: '15px',
-              fontWeight: '700',
-              color: colors.text,
-              textAlign: 'center',
-            }}
-          >
-            {crosswordDone
-              ? 'All done!'
-              : crosswordActiveEntry
-                ? `${label(crosswordActiveEntry)}: ${crosswordActiveEntry.clue}`
-                : ''}
+          {/* The clue for the word being worked on, with arrows to move between clues */}
+          <div style={{ display: 'flex', alignItems: 'stretch', gap: '6px', marginBottom: '12px' }}>
+            <button
+              onClick={() => goToCrosswordClue(-1)}
+              disabled={crosswordDone}
+              aria-label="Previous clue"
+              style={arrowButton(colors)}
+            >
+              ‹
+            </button>
+            <div
+              role="status"
+              aria-live="polite"
+              style={{
+                flex: 1,
+                minHeight: '52px',
+                padding: '6px 10px',
+                background: `${colors.primary}14`,
+                borderRadius: '12px',
+                fontSize: '15px',
+                fontWeight: '700',
+                color: colors.text,
+                textAlign: 'center',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+              }}
+            >
+              {crosswordDone
+                ? 'All done!'
+                : crosswordActiveEntry
+                  ? `${label(crosswordActiveEntry)}: ${crosswordActiveEntry.clue}`
+                  : ''}
+            </div>
+            <button
+              onClick={() => goToCrosswordClue(1)}
+              disabled={crosswordDone}
+              aria-label="Next clue"
+              style={arrowButton(colors)}
+            >
+              ›
+            </button>
           </div>
 
           <div
@@ -152,7 +192,7 @@ export default function Crossword({
             style={{
               display: 'grid',
               gridTemplateColumns: `repeat(${crossword.size}, 1fr)`,
-              gap: '3px',
+              gap: 0,
               maxWidth: '340px',
               margin: '0 auto',
             }}
@@ -161,11 +201,18 @@ export default function Crossword({
               row.map((_, c) => {
                 const key = cellKey(r, c);
                 if (crossword.rows[r][c] === null) {
+                  // Black squares along the outside are left out. Ones inside the puzzle are drawn.
                   return (
                     <div
                       key={key}
                       aria-hidden="true"
-                      style={{ aspectRatio: '1', background: colors.text, borderRadius: '6px' }}
+                      style={{
+                        aspectRatio: '1',
+                        background: crossword.outside.has(key) ? 'transparent' : colors.text,
+                        boxShadow: crossword.outside.has(key)
+                          ? 'none'
+                          : `0 0 0 0.75px ${colors.text}`,
+                      }}
                     />
                   );
                 }
@@ -196,8 +243,11 @@ export default function Crossword({
                       padding: 0,
                       background,
                       color,
-                      border: `2px solid ${isSelected ? colors.primary : 'transparent'}`,
-                      borderRadius: '6px',
+                      border: 'none',
+                      borderRadius: 0,
+                      // Thin lines around every square, shared with the square next door
+                      boxShadow: `0 0 0 0.75px ${colors.text}`,
+                      zIndex: isSelected ? 1 : 0,
                       fontSize: 'clamp(20px, 7vw, 28px)',
                       fontWeight: '800',
                       cursor: 'pointer',
@@ -323,6 +373,27 @@ export default function Crossword({
           {clueList('across', 'Across')}
           {clueList('down', 'Down')}
         </div>
+
+        <div style={{ textAlign: 'center', marginTop: '14px' }}>
+          <button
+            onClick={() => window.print()}
+            style={{
+              minHeight: '48px',
+              padding: '0 22px',
+              background: `${colors.primary}14`,
+              color: colors.primaryText,
+              border: 'none',
+              borderRadius: '999px',
+              fontSize: '15px',
+              fontWeight: '700',
+              cursor: 'pointer',
+              touchAction: 'manipulation',
+            }}
+          >
+            Print this puzzle
+          </button>
+        </div>
+        <CrosswordPrintSheet crossword={crossword} />
       </div>
     </>
   );

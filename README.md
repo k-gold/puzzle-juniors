@@ -6,7 +6,7 @@ Kid-friendly word games, live at https://puzzlejuniors.com.
 - **Word Search:** find the hidden words in a 10x10 grid. Themes unlock as points are earned. A Print button makes a black and white sheet (puzzle and word list, then an answer key) that can also be saved as a PDF from the print dialog.
 - **Guess the Word:** a four-letter word guessing game, with a Daily puzzle and unlimited Practice.
 - **Word Scramble:** five words a round. Tap the mixed-up letter tiles to spell the word shown by the emoji picture.
-- **Mini Crossword:** 5x5 crosswords with text clues. Tap a square and type (on screen or on a keyboard). Each word checks itself when it is full: a right word locks in green, a wrong one clears.
+- **Mini Crossword:** 5x5 crosswords with text clues. Tap a square and type (on screen or on a keyboard). Each word checks itself when it is full: a right word locks in green and the game moves to the next open clue, a wrong one clears. Arrows beside the clue (or the arrow keys) move around, and a Print button makes a sheet with the blank puzzle and clues, then an answer key.
 - **Seasonal themes:** opening the game during Valentine's, Spring, Summer and School, Halloween or Winter unlocks that season's Word Search theme and color theme for good. While a season is on, its Word Search comes up about half the time.
 - **Rewards:** points, badges, unlockable word search themes and color themes.
 

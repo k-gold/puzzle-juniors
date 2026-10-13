@@ -143,3 +143,50 @@ button:focus-visible {
     transform: translateX(4px);
   }
 }
+
+/* Printed Mini Crossword (src/components/CrosswordPrintSheet.jsx) */
+@media print {
+  .print-cw td {
+    position: relative;
+    width: 2.6cm;
+    height: 2.6cm;
+    border: 1.5px solid #000;
+    font-size: 30pt;
+  }
+  /* Squares that are not part of the puzzle are left blank, with no lines */
+  .print-cw td.print-gap {
+    border: none;
+  }
+  .print-cw td.print-block {
+    background: #000;
+  }
+  .print-number {
+    position: absolute;
+    top: 3px;
+    left: 5px;
+    font-size: 11pt;
+    font-weight: 700;
+    line-height: 1;
+  }
+  .print-clues {
+    display: flex;
+    gap: 1cm;
+    text-align: left;
+    font-size: 12pt;
+  }
+  .print-clues > div {
+    flex: 1;
+  }
+  .print-clues h2 {
+    font-size: 14pt;
+    margin: 0 0 4pt;
+  }
+  .print-clues ol {
+    margin: 0;
+    padding-left: 1.4em;
+    line-height: 1.5;
+  }
+  .print-clues li {
+    break-inside: avoid;
+  }
+}

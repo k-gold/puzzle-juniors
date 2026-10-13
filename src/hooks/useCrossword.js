@@ -60,9 +60,46 @@ export function useCrossword(savedState, progress) {
     setSelected({ r, c, dir });
   };
 
-  const selectEntry = (entry) => {
-    const [r, c] = entry.cells.find(([er, ec]) => !letters[cellKey(er, ec)]) || entry.cells[0];
+  // Clues in the order players read them: all the Across clues, then all the Down clues
+  const ordered = useMemo(
+    () => [
+      ...puzzle.entries.filter((e) => e.dir === 'across'),
+      ...puzzle.entries.filter((e) => e.dir === 'down'),
+    ],
+    [puzzle],
+  );
+
+  // Go to a word, starting at its first empty square
+  const selectEntry = (entry, filled = letters) => {
+    const [r, c] = entry.cells.find(([er, ec]) => !filled[cellKey(er, ec)]) || entry.cells[0];
     setSelected({ r, c, dir: entry.dir });
+  };
+
+  // Move `step` clues along (wrapping around), skipping words that are already solved
+  const stepClue = (from, step, solvedIds = solved, filled = letters) => {
+    const start = ordered.findIndex((e) => e.id === from.id);
+    for (let i = 1; i <= ordered.length; i++) {
+      const entry =
+        ordered[(((start + step * i) % ordered.length) + ordered.length) % ordered.length];
+      if (!solvedIds.includes(entry.id)) return selectEntry(entry, filled);
+    }
+  };
+  const goToClue = (step) => activeEntry && stepClue(activeEntry, step);
+
+  // Arrow keys: move to the next square that is part of the puzzle
+  const moveCell = (dr, dc) => {
+    let r = selected.r + dr;
+    let c = selected.c + dc;
+    while (r >= 0 && c >= 0 && r < puzzle.size && c < puzzle.size) {
+      if (puzzle.rows[r][c] !== null) {
+        const at = entriesAt(puzzle, r, c);
+        const wanted = dc !== 0 ? 'across' : 'down';
+        setSelected({ r, c, dir: at[wanted] ? wanted : selected.dir });
+        return;
+      }
+      r += dr;
+      c += dc;
+    }
   };
 
   // Right and wrong are decided for every word that this square belongs to
@@ -111,17 +148,27 @@ export function useCrossword(savedState, progress) {
           if (!lockedElsewhere) delete cleared[key];
         }
       }
-      return cleared;
+      return { letters: cleared, solvedNow: newlySolved };
     }
-    return nextLetters;
+    return { letters: nextLetters, solvedNow: newlySolved };
   };
 
   const typeLetter = (letter) => {
     if (done || !activeEntry) return;
     const key = cellKey(selected.r, selected.c);
     if (lockedCells.has(key)) return;
-    const next = checkEntries({ ...letters, [key]: letter }, selected.r, selected.c);
+    const { letters: next, solvedNow } = checkEntries(
+      { ...letters, [key]: letter },
+      selected.r,
+      selected.c,
+    );
     setLetters(next);
+    // The word is right: on to the next clue that is still open
+    if (solvedNow.some((e) => e.id === activeEntry.id)) {
+      const solvedIds = [...solved, ...solvedNow.map((e) => e.id)];
+      if (solvedIds.length < puzzle.entries.length) stepClue(activeEntry, 1, solvedIds, next);
+      return;
+    }
     // A wrong word was cleared: go back to the start of the word to try again
     if (!next[key]) {
       const start = activeEntry.cells.find(([r, c]) => !next[cellKey(r, c)]);
@@ -182,6 +229,8 @@ export function useCrossword(savedState, progress) {
     selectCrosswordEntry: selectEntry,
     typeCrosswordLetter: typeLetter,
     crosswordBackspace: backspace,
+    goToCrosswordClue: goToClue,
+    moveCrosswordCell: moveCell,
     newCrossword,
   };
 }

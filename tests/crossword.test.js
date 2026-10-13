@@ -53,3 +53,11 @@ test('parseGrid numbers words the usual way', () => {
   assert.equal(puzzle.numbers['0,0'], 1);
   assert.equal(puzzle.entries.length, 6);
 });
+
+test('black squares along the outside are left out, ones inside the puzzle are drawn', () => {
+  const puzzle = parseGrid('CORAL/A#U##/TULIP/##E#I/HORSE');
+  assert.ok(!puzzle.outside.has('1,1'), 'the square in the middle of the grid is enclosed');
+  assert.ok(puzzle.outside.has('1,4'));
+  assert.ok(puzzle.outside.has('3,0'));
+  assert.ok(puzzle.outside.has('3,1'), 'it connects to the edge through another black square');
+});

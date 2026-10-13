@@ -7,6 +7,7 @@ export const CROSSWORD_FINISH_BONUS = 25;
 //   rows     the letters, with null for a black square
 //   entries  every word, with its number, direction, squares, answer and clue
 //   numbers  the clue number to print in a square ("r,c" -> number)
+//   outside  black squares to leave out when drawing (the rest are drawn black)
 export function parseGrid(text) {
   const rows = text.split('/');
   const size = rows.length;
@@ -42,8 +43,33 @@ export function parseGrid(text) {
       }
     }
   }
+  // Black squares that connect to the edge of the grid are left out when drawing, so only the
+  // squares inside the puzzle's outline show as black. Found by walking in from the edges.
+  const outside = new Set();
+  const queue = [];
+  const visit = (r, c) => {
+    if (r < 0 || c < 0 || r >= size || c >= size) return;
+    if (white(r, c) || outside.has(cellKey(r, c))) return;
+    outside.add(cellKey(r, c));
+    queue.push([r, c]);
+  };
+  for (let i = 0; i < size; i++) {
+    visit(0, i);
+    visit(size - 1, i);
+    visit(i, 0);
+    visit(i, size - 1);
+  }
+  while (queue.length) {
+    const [r, c] = queue.pop();
+    visit(r - 1, c);
+    visit(r + 1, c);
+    visit(r, c - 1);
+    visit(r, c + 1);
+  }
+
   return {
     size,
+    outside,
     rows: rows.map((row) => [...row].map((ch) => (ch === '#' ? null : ch))),
     entries,
     numbers,
