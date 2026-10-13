@@ -3,6 +3,12 @@ import { GRIDS } from '../data/crosswordPuzzles.js';
 import { parseGrid, entriesAt, cellKey, CROSSWORD_FINISH_BONUS } from '../lib/crossword.js';
 import { play } from '../lib/sound.js';
 
+// Start on the first Across clue (or the first Down clue if there is no Across one)
+const firstSelection = (puzzle) => {
+  const entry = puzzle.entries.find((e) => e.dir === 'across') || puzzle.entries[0];
+  return { r: entry.cells[0][0], c: entry.cells[0][1], dir: entry.dir };
+};
+
 const randomGrid = (not) => {
   const options = GRIDS.filter((g) => g !== not);
   return options[Math.floor(Math.random() * options.length)];
@@ -21,10 +27,10 @@ export function useCrossword(savedState, progress) {
   const [letters, setLetters] = useState(savedOk ? saved.letters || {} : {}); // "r,c" -> letter
   const [solved, setSolved] = useState(savedOk ? saved.solved || [] : []); // entry ids
   const [mistakes, setMistakes] = useState(savedOk ? saved.mistakes || 0 : 0);
-  const [selected, setSelected] = useState({ r: 0, c: 0, dir: 'across' });
   const [shaking, setShaking] = useState(null); // entry id that was just wrong
 
   const puzzle = useMemo(() => parseGrid(grid), [grid]);
+  const [selected, setSelected] = useState(() => firstSelection(puzzle));
   // What gets saved (stable between renders, so saving only happens when something changes)
   const crosswordState = useMemo(
     () => ({ grid, letters, solved, mistakes }),
@@ -45,18 +51,24 @@ export function useCrossword(savedState, progress) {
     if (puzzle.rows[r][c] === null) return;
     const at = entriesAt(puzzle, r, c);
     const same = selected.r === r && selected.c === c;
-    // Tapping the chosen square again switches between across and down
-    const dir = same
-      ? selected.dir === 'across' && at.down
-        ? 'down'
-        : selected.dir === 'down' && at.across
-          ? 'across'
-          : selected.dir
-      : at[selected.dir]
-        ? selected.dir
-        : at.across
-          ? 'across'
-          : 'down';
+    // A square where just one word starts (it has a number) selects that word. Otherwise
+    // tapping the chosen square again switches between across and down, and tapping a new
+    // square keeps the direction when it can.
+    const starting = Object.values(at).filter((e) => e.cells[0][0] === r && e.cells[0][1] === c);
+    const dir =
+      !same && starting.length === 1
+        ? starting[0].dir
+        : same
+          ? selected.dir === 'across' && at.down
+            ? 'down'
+            : selected.dir === 'down' && at.across
+              ? 'across'
+              : selected.dir
+          : at[selected.dir]
+            ? selected.dir
+            : at.across
+              ? 'across'
+              : 'down';
     setSelected({ r, c, dir });
   };
 
@@ -207,11 +219,12 @@ export function useCrossword(savedState, progress) {
   };
 
   const newCrossword = () => {
-    setGrid(randomGrid(grid));
+    const next = randomGrid(grid);
+    setGrid(next);
     setLetters({});
     setSolved([]);
     setMistakes(0);
-    setSelected({ r: 0, c: 0, dir: 'across' });
+    setSelected(firstSelection(parseGrid(next)));
     setGamesCompleted((prev) => ({ ...prev, crossword: (prev.crossword || 0) + 1 }));
   };
 
