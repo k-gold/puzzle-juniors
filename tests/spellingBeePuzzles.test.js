@@ -71,3 +71,25 @@ test('isValidPuzzle rejects repeated letters, a missing center and unknown puzzl
   assert.equal(isValidPuzzle({ letters: ['C', 'H', 'E', 'A', 'R', 'S', 'T'], center: 'E' }), false);
   assert.equal(isValidPuzzle({ letters, center }), true);
 });
+
+test('puzzles do not repeat until every puzzle has been played', async () => {
+  const { pickSpellingBeePuzzle, puzzleKey } = await import('../src/data/spellingBeePuzzles.js');
+  let seen = [];
+  let current = null;
+  const played = [];
+  for (let i = 0; i < PUZZLES.length; i++) {
+    const picked = pickSpellingBeePuzzle(seen, current);
+    played.push(puzzleKey(picked.puzzle));
+    seen = picked.seen;
+    current = picked.puzzle;
+  }
+  assert.equal(new Set(played).size, PUZZLES.length);
+  // Then the list starts over, and the next one is not the one just played
+  const next = pickSpellingBeePuzzle(seen, current);
+  assert.notEqual(puzzleKey(next.puzzle), puzzleKey(current));
+  assert.equal(next.seen.length, 1);
+});
+
+test('there are plenty of Letter Puzzles', () => {
+  assert.ok(PUZZLES.length >= 60, `only ${PUZZLES.length} puzzles`);
+});

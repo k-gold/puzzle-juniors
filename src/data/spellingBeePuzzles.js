@@ -2,16 +2,31 @@ import { PUZZLES } from './beePuzzleList.js';
 
 const shuffled = (list) => [...list].sort(() => Math.random() - 0.5);
 
-// Pick a random puzzle. The seven letters are mixed up (center last) so they do not
-// spell the pangram. Only letters and center are kept in saved progress; the answers are
-// looked up again with findPuzzle.
-export const generateSpellingBeePuzzle = () => {
-  const { letters, center } = PUZZLES[Math.floor(Math.random() * PUZZLES.length)];
+// What identifies a puzzle, whatever order its letters are shown in
+export const puzzleKey = (p) => `${[...p.letters].sort().join('')}-${p.center}`;
+
+// The seven letters are mixed up (center last) so they do not spell the pangram. Only letters
+// and center are kept in saved progress; the answers are looked up again with findPuzzle.
+const toPlayable = ({ letters, center }) => ({
+  letters: [...shuffled(letters.filter((l) => l !== center)), center],
+  center,
+});
+
+// A puzzle the player has not had yet, until every puzzle has been played. Then the list starts
+// over. `seen` is the list of puzzle keys already played, and the updated list comes back too.
+export const pickSpellingBeePuzzle = (seen = [], current = null) => {
+  const currentKey = current && puzzleKey(current);
+  const unseen = PUZZLES.filter((p) => !seen.includes(puzzleKey(p)) && puzzleKey(p) !== currentKey);
+  const options = unseen.length ? unseen : PUZZLES.filter((p) => puzzleKey(p) !== currentKey);
+  const chosen = options[Math.floor(Math.random() * options.length)];
   return {
-    letters: [...shuffled(letters.filter((l) => l !== center)), center],
-    center,
+    puzzle: toPlayable(chosen),
+    seen: unseen.length ? [...seen, puzzleKey(chosen)] : [puzzleKey(chosen)],
   };
 };
+
+// A random puzzle
+export const generateSpellingBeePuzzle = () => pickSpellingBeePuzzle().puzzle;
 
 const sameLetters = (a, b) => [...a].sort().join('') === [...b].sort().join('');
 

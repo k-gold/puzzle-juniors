@@ -1,0 +1,41 @@
+# Words that should never be accepted or shown in Puzzle Juniors: slurs, vulgar or sexual words,
+# drug and alcohol words, and a few others that are not right for a kids' game.
+#
+# One lowercase word per line. Lines starting with # are notes.
+# After changing this file run: node scripts/filter-dictionary.mjs
+# The tests (tests/safety.test.js) fail if any of these is in public/words.txt or in a puzzle.
+
+# Slurs and insults
+abo abos bint blacks boche boches bosche bosches bohunk boong boonga boongas boongs chav chinks
+chinky coolie coolies cooly coondog dago dagos darkey darkeys darkies darky dike douche faggery
+faggier faggy fagged fagoted fagoter fagotti fagotto feg gippo gippos gippy gook gooks gooky gora
+goras goy goyim gyp gypped gyppie gyppies gyppo gyppos gyppy haole haoles hebe hebes honkers honkeys
+honkie honkies honky hori horis japs jewed kaffir kafir kraut krauts lesbo lesbos lez lezz lezzie
+lezzies lezzy limey limy lubra mick mong mulatto munt munter mzungu mzungus negress nigers niggle
+niggled niggles nips paddy pikey pinko pollack pommy punani quashie queers redleg redlegs redskin
+ritard sambo sambos schizo sheeney shylock skanks skanky slanty sloper slopers spick spicks spics
+spik spiks squaw trannie wab whitey whiteys whities wigga wiggas wigger wiggers wog wogs wop yid
+yids yobbo cripple midget gimp gypsy redneck moron wench wuss sissy fatso dimwit floozy hussy
+jackass schmuck
+
+# Vulgar and crude words
+bampot bazooms bimbo boink bong caca cawks chode cocky cooter crapola crapper crappy cummin cumquat
+cumshaw dammit diddle dong doodoo fart feck fecked feckin fecking feckly fecks felched felches
+frigger fugly hells hoe hoes hooter hooters hoor humped humper hump humps jiggy kink knobs lech
+minge minger nads nookie nooky nooner nudger perse perv pimp pimped pimping pis pises pooping puss
+quickie quicky scrog shat shitzu shitzus skag scag slag slapper slutch slutchy smutty snuff stiffy
+tush turds turdine turdion turdoid vag weenie weewee weiner whacker whoring willie wazoo booty
+boobed boobie boobies boobing boobish pennis
+
+# Sexual and body words
+areola areole bosomy boned coital coitus condom enema faeces fetish fisted flasher fondle genital
+gigolo glans gonad gonads hymen libido lusty menage molest naked orgies orifice pantie penial
+penile phalli phallic pubic pubis rectal rectus seduce sexed sexing sexpot sexual spank sperm
+teat teste testee testes testis turnon vaginas
+
+# Drugs and alcohol
+cocain cocaine extasy ganja heroin hooch hootch junkie junky meth opium peyote reefer stoned
+stoner valium booze whiskey vodka beer tequila drunk cigar
+
+# Violence and other
+lynch torture nazis sodom suicide

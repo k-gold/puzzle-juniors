@@ -1,7 +1,8 @@
 import { useState } from 'react';
 import { isValidWord } from '../lib/wordList.js';
 import {
-  generateSpellingBeePuzzle,
+  pickSpellingBeePuzzle,
+  puzzleKey,
   isValidPuzzle,
   findPuzzle,
 } from '../data/spellingBeePuzzles.js';
@@ -18,9 +19,13 @@ export function useSpellingBee(savedState, progress) {
   // Spelling Bee state - start with random puzzle if no saved state
   // A saved puzzle that is not playable (an old bug) is replaced along with its found words.
   const savedPuzzleOk = isValidPuzzle(savedState?.puzzle);
-  const [puzzle, setPuzzle] = useState(() =>
-    savedPuzzleOk ? savedState.puzzle : generateSpellingBeePuzzle(),
+  const [start] = useState(() =>
+    savedPuzzleOk
+      ? { puzzle: savedState.puzzle, seen: savedState.beeSeen || [puzzleKey(savedState.puzzle)] }
+      : pickSpellingBeePuzzle(),
   );
+  const [puzzle, setPuzzle] = useState(start.puzzle);
+  const [beeSeen, setBeeSeen] = useState(start.seen); // puzzles played since the list last started over
   const [currentWord, setCurrentWord] = useState('');
   const [foundWords, setFoundWords] = useState(savedPuzzleOk ? savedState?.foundWords || [] : []);
   const [message, setMessage] = useState('');
@@ -126,7 +131,9 @@ export function useSpellingBee(savedState, progress) {
   };
 
   const newGame = () => {
-    setPuzzle(generateSpellingBeePuzzle());
+    const picked = pickSpellingBeePuzzle(beeSeen, puzzle);
+    setPuzzle(picked.puzzle);
+    setBeeSeen(picked.seen);
     setCurrentWord('');
     setFoundWords([]);
     setMessage('');
@@ -149,6 +156,7 @@ export function useSpellingBee(savedState, progress) {
   const outerLetters = puzzle.letters.filter((l) => l !== puzzle.center);
 
   return {
+    beeSeen,
     puzzle,
     setPuzzle,
     currentWord,

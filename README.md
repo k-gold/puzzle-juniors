@@ -96,7 +96,9 @@ npm install --no-save wordlist-english
 node scripts/build-bee-puzzles.mjs
 ```
 
-This rewrites `src/data/beePuzzleList.js` with the letters, a center letter, and the answers: common words from the word list that can be spelled from those letters. Words that are not right for kids go in the `BLOCKED` list in the same script. Read the new puzzle's answers before committing. The tests check that each puzzle has 30 to 70 answers, that all of them are in `public/words.txt`, and that there is at least one pangram. Players can still enter any valid dictionary word. The answer list only decides the rank.
+This rewrites `src/data/beePuzzleList.js` with the letters, a center letter, and the answers: common words from the word list that can be spelled from those letters. Words that are not right for kids go in `NOT_FOR_ANSWERS` or `BLOCKED` in the same script (and everything in `scripts/blocked-words.txt` is left out too). Read the new puzzle's answers before committing. The tests check that each puzzle has 30 to 70 answers, that all of them are in `public/words.txt`, and that there is at least one pangram. Players can still enter any valid dictionary word. The answer list only decides the rank. The game remembers which puzzles a player has had and does not repeat one until all of them have been played.
+
+**Keep words kid-safe.** `scripts/blocked-words.txt` lists slurs, vulgar, sexual and drug words. Run `node scripts/filter-dictionary.mjs` after editing it: that removes them from `public/words.txt`, so they cannot be entered for points. `tests/safety.test.js` fails if a blocked word is in the dictionary or in any game's words. Guess the Word answers are picked by position, so to replace one, change it in place rather than deleting it.
 
 Players' saved puzzles must be one of the puzzles in the list. If you remove a puzzle, anyone halfway through it gets a new one.
 
@@ -112,7 +114,7 @@ Players' saved puzzles must be one of the puzzles in the list. If you remove a p
 
 `public/words.txt` is the dictionary for checking guesses. Checking against a file on our own site means the games never depend on a third-party dictionary service being up.
 
-It was built from the `word-list` npm package, keeping lowercase words of 3 to 7 letters, with words from the `badwords-list` package removed. It is committed to the repo and not rebuilt during the build. If you regenerate it, review the result before committing, because the source lists are broad.
+It was built from the `word-list` npm package, keeping lowercase words of 3 to 7 letters, with words from the `badwords-list` package removed. It is committed to the repo and not rebuilt during the build. If you regenerate it, review the result before committing, because the source lists are broad. A further list of slurs and crude, sexual and drug words (`scripts/blocked-words.txt`) has been removed from it by `scripts/filter-dictionary.mjs`.
 
 ## Saved progress
 
