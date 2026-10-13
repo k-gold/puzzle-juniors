@@ -55,7 +55,7 @@ The tests include a smoke test that renders every screen, so a change that break
 
 ## Offline, home screen and sound
 
-The site works offline and can be added to a phone's home screen (on iPhone: Safari, Share, Add to Home Screen). No app store or developer account is involved. At build time `scripts/precache-plugin.mjs` writes `dist/sw.js`, a small service worker that saves every built file, so there is nothing to maintain by hand. Page loads try the network first, so new versions arrive as soon as a player is online. The app icon is `public/icons/app-icon.svg`, rendered to the PNG sizes listed in `public/manifest.webmanifest`.
+The site works offline and can be added to a phone's home screen (on iPhone: Safari, Share, Add to Home Screen). No app store or developer account is involved. At build time `scripts/precache-plugin.mjs` writes `dist/sw.js`, a small service worker that saves every built file, so there is nothing to maintain by hand. Page loads try the network first, so new versions arrive as soon as a player is online. The browser tab icon is `public/favicon.svg` (with `favicon-32.png` as a fallback). The app icon is `public/icons/app-icon.svg`, rendered to the PNG sizes listed in `public/manifest.webmanifest`.
 
 Sound effects are made in the browser (`src/lib/sound.js`), so there are no sound files. They are off until a player turns them on in Rewards, Settings.
 
