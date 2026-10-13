@@ -7,7 +7,8 @@ const FINISH_BONUS = 25;
 
 export function useWordSearch(savedState, progress) {
   const {
-    unlockedThemes,
+    wordSearchThemes,
+    activeSeason,
     setTotalWordsFound,
     setGamesCompleted,
     awardPoints,
@@ -17,7 +18,7 @@ export function useWordSearch(savedState, progress) {
 
   // Word Search state - start with random puzzle if no saved state
   const [wordSearchPuzzle, setWordSearchPuzzle] = useState(
-    () => savedState?.wordSearchPuzzle || generateWordSearchPuzzle(unlockedThemes),
+    () => savedState?.wordSearchPuzzle || generateWordSearchPuzzle(wordSearchThemes, activeSeason),
   );
   const [wsFoundWords, setWsFoundWords] = useState(savedState?.wsFoundWords || []);
   // Wrong guesses in this puzzle (a puzzle with none earns the Sharp Eyes badge)
@@ -155,7 +156,7 @@ export function useWordSearch(savedState, progress) {
   };
 
   const newWordSearch = () => {
-    setWordSearchPuzzle(generateWordSearchPuzzle(unlockedThemes));
+    setWordSearchPuzzle(generateWordSearchPuzzle(wordSearchThemes, activeSeason));
     setWsFoundWords([]);
     setWsMisses(0);
     setWsSelectedCells([]);

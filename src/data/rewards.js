@@ -30,6 +30,52 @@ export const WORD_SEARCH_THEMES = [
   { id: 'asher', name: "Asher's Faves", points: 1100, icon: '🚛' },
 ];
 
+// Seasonal rewards. Opening the game during a season's dates earns that season's Word Search
+// theme and color theme for good (both use the season's id). Dates are [month, day], inclusive,
+// must not overlap, and must stay within one calendar year.
+export const SEASONS = [
+  {
+    id: 'valentines',
+    name: "Valentine's",
+    icon: '💝',
+    start: [1, 25],
+    end: [2, 14],
+    colors: ['#E11D48', '#FB7185', '#F472B6'],
+  },
+  {
+    id: 'spring',
+    name: 'Spring',
+    icon: '🌷',
+    start: [3, 20],
+    end: [5, 20],
+    colors: ['#65A30D', '#FDE047', '#F472B6'],
+  },
+  {
+    id: 'summer',
+    name: 'Summer and School',
+    icon: '🏖️',
+    start: [6, 1],
+    end: [9, 10],
+    colors: ['#06B6D4', '#FDE047', '#F97316'],
+  },
+  {
+    id: 'halloween',
+    name: 'Halloween',
+    icon: '🎃',
+    start: [10, 1],
+    end: [10, 31],
+    colors: ['#F97316', '#7C3AED', '#2A1245'],
+  },
+  {
+    id: 'winter',
+    name: 'Winter Holidays',
+    icon: '⛄',
+    start: [12, 1],
+    end: [12, 31],
+    colors: ['#2563EB', '#93C5FD', '#DC2626'],
+  },
+];
+
 export const VISUAL_THEMES = [
   {
     id: 'classic',

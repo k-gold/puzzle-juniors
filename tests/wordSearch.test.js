@@ -2,11 +2,11 @@ import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { generateWordSearchPuzzle } from '../src/lib/wordSearch.js';
 import { WORD_LISTS_BY_THEME } from '../src/data/wordSearchWords.js';
-import { WORD_SEARCH_THEMES } from '../src/data/rewards.js';
+import { WORD_SEARCH_THEMES, SEASONS } from '../src/data/rewards.js';
 
 test('every reward theme has a word list, and every word list has a reward', () => {
   assert.deepEqual(
-    WORD_SEARCH_THEMES.map((t) => t.id).sort(),
+    [...WORD_SEARCH_THEMES, ...SEASONS].map((t) => t.id).sort(),
     Object.keys(WORD_LISTS_BY_THEME).sort(),
   );
 });

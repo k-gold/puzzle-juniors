@@ -54,7 +54,7 @@ for (const [label, saved] of [
 
 test('every Word Search theme is unlocked once enough points are earned', () => {
   const html = render({ points: 5000 }, 'store');
-  assert.ok(!html.includes('locked,'), 'no theme should still be locked at 5000 points');
+  assert.ok(!/locked, \d+ points/.test(html), 'no theme should still be locked at 5000 points');
 });
 
 test('Word Search themes that need more points are shown as locked', () => {

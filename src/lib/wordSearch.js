@@ -1,9 +1,13 @@
 import { WORD_LISTS_BY_THEME } from '../data/wordSearchWords.js';
 
-// Generate random Word Search puzzle from unlocked themes
-export const generateWordSearchPuzzle = (unlockedThemesList) => {
-  // Pick a random theme from unlocked themes
-  const randomTheme = unlockedThemesList[Math.floor(Math.random() * unlockedThemesList.length)];
+// Generate random Word Search puzzle from unlocked themes. A theme that is in season is
+// picked half the time, so players actually see it while it is around.
+export const generateWordSearchPuzzle = (unlockedThemesList, seasonTheme = null) => {
+  const inSeason = seasonTheme && unlockedThemesList.includes(seasonTheme);
+  const randomTheme =
+    inSeason && Math.random() < 0.5
+      ? seasonTheme
+      : unlockedThemesList[Math.floor(Math.random() * unlockedThemesList.length)];
   const words = WORD_LISTS_BY_THEME[randomTheme];
   const size = 10;
   const grid = Array(size)

@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
-import { WORD_SEARCH_THEMES } from '../data/rewards.js';
+import { WORD_SEARCH_THEMES, SEASONS } from '../data/rewards.js';
+import { seasonOn } from '../lib/seasons.js';
 import { play, setSoundEnabled } from '../lib/sound.js';
 
 export function useProgress(savedState) {
@@ -89,6 +90,18 @@ export function useProgress(savedState) {
     knownThemes.current = unlockedThemes.length;
   }, [unlockedThemes.length]);
 
+  // Seasons the player has opened the game during. Their themes stay unlocked for good.
+  const [seasonsEarned, setSeasonsEarned] = useState(savedState?.seasonsEarned || []);
+  const activeSeason = seasonOn();
+  useEffect(() => {
+    if (!activeSeason || seasonsEarned.includes(activeSeason)) return;
+    const season = SEASONS.find((s) => s.id === activeSeason);
+    setSeasonsEarned((prev) => [...prev, activeSeason]);
+    notify({ icon: season.icon, title: 'Seasonal Theme Unlocked!', name: season.name });
+  }, [activeSeason]);
+  // Every Word Search theme a new puzzle can use
+  const wordSearchThemes = [...unlockedThemes, ...seasonsEarned];
+
   const [badgeTooltip, setBadgeTooltip] = useState(null);
 
   // Award points with animation
@@ -147,6 +160,9 @@ export function useProgress(savedState) {
     animatedPoints,
     setAnimatedPoints,
     unlockedThemes,
+    seasonsEarned,
+    activeSeason,
+    wordSearchThemes,
     unlockedVisualThemes,
     setUnlockedVisualThemes,
     currentVisualTheme,

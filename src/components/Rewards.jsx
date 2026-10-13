@@ -1,4 +1,5 @@
-import { WORD_SEARCH_THEMES, VISUAL_THEMES, BADGES } from '../data/rewards.js';
+import { WORD_SEARCH_THEMES, VISUAL_THEMES, SEASONS, BADGES } from '../data/rewards.js';
+import { seasonDates } from '../lib/seasons.js';
 
 const cardShadow = '0 1px 2px rgba(0,0,0,0.06), 0 6px 16px rgba(0,0,0,0.04)';
 
@@ -138,6 +139,8 @@ export default function Rewards({
   wordlePoints,
   scramblePoints,
   unlockedThemes,
+  seasonsEarned,
+  activeSeason,
   unlockedVisualThemes,
   setUnlockedVisualThemes,
   currentVisualTheme,
@@ -383,6 +386,69 @@ export default function Rewards({
                     <span style={tileStatus(canUnlock ? colors.primaryText : colors.textLight)}>
                       {canUnlock ? 'Tap!' : `${theme.points} pts`}
                     </span>
+                  )}
+                </Tile>
+              );
+            })}
+          </div>
+        </Card>
+
+        {/* Seasonal themes */}
+        <Card
+          colors={colors}
+          title="Seasonal Themes"
+          count={`${seasonsEarned.length}/${SEASONS.length}`}
+        >
+          <p
+            style={{
+              margin: '0 0 12px',
+              fontSize: '13px',
+              fontWeight: '600',
+              color: colors.textLight,
+            }}
+          >
+            Play during a season to unlock its Word Search and colors for good.
+          </p>
+          <div
+            style={{
+              display: 'grid',
+              gridTemplateColumns: 'repeat(auto-fill, minmax(130px, 1fr))',
+              gap: '10px',
+            }}
+          >
+            {SEASONS.map((season) => {
+              const isUnlocked = seasonsEarned.includes(season.id);
+              const isActive = currentVisualTheme === season.id;
+              const dates = seasonDates(season);
+              const status = isActive
+                ? 'in use'
+                : isUnlocked
+                  ? 'unlocked, tap to use colors'
+                  : `locked, available ${dates}`;
+
+              return (
+                <Tile
+                  key={season.id}
+                  colors={colors}
+                  label={`${season.name}, ${status}`}
+                  background={isActive ? `${colors.primary}14` : colors.background}
+                  border={
+                    isActive ? colors.primary : isUnlocked ? colors.success : colors.background
+                  }
+                  dimmed={!isUnlocked}
+                  disabled={!isUnlocked}
+                  onClick={() => setCurrentVisualTheme(season.id)}
+                >
+                  <span style={{ fontSize: '30px', lineHeight: 1 }} aria-hidden="true">
+                    {season.icon}
+                  </span>
+                  <span style={tileName(colors)}>{season.name}</span>
+                  {isActive ? (
+                    <span style={tileStatus(colors.primaryText)}>Active ✓</span>
+                  ) : isUnlocked ? (
+                    <span style={tileStatus(colors.successText)}>Tap to use colors</span>
+                  ) : (
+                    <span style={tileStatus(colors.textLight)}>{dates}</span>
                   )}
                 </Tile>
               );

@@ -6,6 +6,7 @@ Kid-friendly word games, live at https://puzzlejuniors.com.
 - **Word Search:** find the hidden words in a 10x10 grid. Themes unlock as points are earned. A Print button makes a black and white sheet (puzzle and word list, then an answer key) that can also be saved as a PDF from the print dialog.
 - **Guess the Word:** a four-letter word guessing game, with a Daily puzzle and unlimited Practice.
 - **Word Scramble:** five words a round. Tap the mixed-up letter tiles to spell the word shown by the emoji picture.
+- **Seasonal themes:** opening the game during Valentine's, Spring, Summer and School, Halloween or Winter Holidays unlocks that season's Word Search theme and color theme for good. While a season is on, its Word Search comes up about half the time.
 - **Rewards:** points, badges, unlockable word search themes and color themes.
 
 Everything runs in the browser. There is no server and no account system. Progress is saved in the player's own browser (`localStorage`).
@@ -80,6 +81,8 @@ tests/                  Tests, run with node:test
 **Add a Wordle answer.** Add a four-letter uppercase word to the end of `src/data/wordleWords.js`. The word must also be in `public/words.txt`, or the puzzle could not be won, and it must not already be in the list. The tests check all three. The daily puzzle picks its word by position in this list, so do not reorder or remove words that have already been used: that would change what players see on days they have already played.
 
 **Add a Word Scramble word.** Add a `['WORD', '🙂']` pair to `src/data/scrambleWords.js`: 3 to 7 capital letters, a picture that only one word fits, and the word must be in `public/words.txt`. The tests check the length, letters, dictionary and duplicates. Round length and the perfect round bonus are in `src/lib/scramble.js`.
+
+**Change or add a season.** Seasons are in `SEASONS` in `src/data/rewards.js` (dates are [month, day], must not overlap). Each needs a word list in `src/data/wordSearchWords.js` and a color theme in `src/data/colorThemes.js`, both under the season's id. The tests check dates, word lists and color themes. Earned seasons are saved as `seasonsEarned`.
 
 **Add a Word Search theme.** Add its words to `src/data/wordSearchWords.js` and its card (name, icon, points needed) to `WORD_SEARCH_THEMES` in `src/data/rewards.js`. Themes unlock by themselves when a player's points reach the number on the card. Words must be 10 letters or fewer. The tests check that both lists match.
 
