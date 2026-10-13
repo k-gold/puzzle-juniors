@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
 import { WORD_SEARCH_THEMES } from '../data/rewards.js';
+import { play, setSoundEnabled } from '../lib/sound.js';
 
 export function useProgress(savedState) {
   // Points system
@@ -7,6 +8,20 @@ export function useProgress(savedState) {
   const [spellingPoints, setSpellingPoints] = useState(savedState?.spellingPoints || 0);
   const [wordSearchPoints, setWordSearchPoints] = useState(savedState?.wordSearchPoints || 0);
   const [wordlePoints, setWordlePoints] = useState(savedState?.wordlePoints || 0);
+  // `points` is everything the player has earned. It decides unlocks and badges, so it only ever
+  // goes up. Spending on hints is tracked separately, and the balance is what is left to spend.
+  const [spentPoints, setSpentPoints] = useState(savedState?.spentPoints || 0);
+  const balance = points - spentPoints;
+  const spendPoints = (amount) => {
+    if (balance < amount) return false;
+    setSpentPoints((prev) => prev + amount);
+    return true;
+  };
+
+  // Sound effects are off until the player turns them on
+  const [soundOn, setSoundOn] = useState(savedState?.soundOn === true);
+  useEffect(() => setSoundEnabled(soundOn), [soundOn]);
+
   const [showPointsAnimation, setShowPointsAnimation] = useState(false);
   const [animatedPoints, setAnimatedPoints] = useState(0);
 
@@ -49,7 +64,10 @@ export function useProgress(savedState) {
   // Popups (badges earned, themes unlocked). They are shown one at a time, three seconds each.
   const [toasts, setToasts] = useState([]);
   const nextToastId = useRef(0);
-  const notify = (toast) => setToasts((prev) => [...prev, { ...toast, id: nextToastId.current++ }]);
+  const notify = (toast) => {
+    setToasts((prev) => [...prev, { ...toast, id: nextToastId.current++ }]);
+    play('sparkle');
+  };
   const currentToastId = toasts[0]?.id;
   useEffect(() => {
     if (currentToastId === undefined) return;
@@ -74,6 +92,7 @@ export function useProgress(savedState) {
   const awardPoints = (amount, gameType = null) => {
     const newPoints = points + amount;
     setPoints(newPoints);
+    play('chime');
     setAnimatedPoints(amount);
     setShowPointsAnimation(true);
     setTimeout(() => setShowPointsAnimation(false), 1500);
@@ -105,6 +124,11 @@ export function useProgress(savedState) {
   return {
     points,
     setPoints,
+    spentPoints,
+    balance,
+    spendPoints,
+    soundOn,
+    setSoundOn,
     spellingPoints,
     setSpellingPoints,
     wordSearchPoints,

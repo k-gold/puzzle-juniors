@@ -82,6 +82,46 @@ function Tile({ colors, border, background, dimmed, disabled, onClick, label, ch
   );
 }
 
+// A labeled on/off switch
+function Toggle({ colors, checked, onChange, title, detail }) {
+  return (
+    <label
+      style={{
+        display: 'flex',
+        alignItems: 'center',
+        gap: '12px',
+        minHeight: '44px',
+        padding: '4px 0',
+        fontSize: '15px',
+        fontWeight: '700',
+        color: colors.text,
+        cursor: 'pointer',
+      }}
+    >
+      <input
+        type="checkbox"
+        checked={checked}
+        onChange={(e) => onChange(e.target.checked)}
+        style={{ width: '24px', height: '24px', accentColor: colors.primary, flex: 'none' }}
+      />
+      <span>
+        {title}
+        <span
+          style={{ display: 'block', fontSize: '13px', fontWeight: '600', color: colors.textLight }}
+        >
+          {detail}
+        </span>
+      </span>
+    </label>
+  );
+}
+
+// True when the site was opened from the home screen instead of a browser tab
+const isInstalled = () =>
+  typeof window !== 'undefined' &&
+  (window.matchMedia?.('(display-mode: standalone)').matches ||
+    window.navigator.standalone === true);
+
 const tileName = (colors) => ({
   fontSize: '14px',
   fontWeight: '700',
@@ -92,6 +132,7 @@ const tileStatus = (color) => ({ fontSize: '12px', fontWeight: '700', color });
 export default function Rewards({
   colors,
   points,
+  balance,
   spellingPoints,
   wordSearchPoints,
   wordlePoints,
@@ -105,6 +146,8 @@ export default function Rewards({
   setBadgeTooltip,
   colorBlindMode,
   setColorBlindMode,
+  soundOn,
+  setSoundOn,
 }) {
   const gameTotals = [
     { label: 'Letter Puzzle', value: spellingPoints },
@@ -168,9 +211,20 @@ export default function Rewards({
             }}
           >
             <span aria-hidden="true">⭐</span>
-            <span>{points}</span>
+            <span>{balance}</span>
           </div>
         </div>
+
+        <p
+          style={{
+            margin: '0 0 14px',
+            fontSize: '13px',
+            fontWeight: '600',
+            color: colors.textLight,
+          }}
+        >
+          Points to spend on hints. Unlocks use everything you have earned: {points} so far.
+        </p>
 
         <div
           style={{
@@ -335,38 +389,33 @@ export default function Rewards({
 
         {/* Settings */}
         <Card colors={colors} title="Settings">
-          <label
-            style={{
-              display: 'flex',
-              alignItems: 'center',
-              gap: '12px',
-              minHeight: '44px',
-              fontSize: '15px',
-              fontWeight: '700',
-              color: colors.text,
-              cursor: 'pointer',
-            }}
-          >
-            <input
-              type="checkbox"
-              checked={colorBlindMode}
-              onChange={(e) => setColorBlindMode(e.target.checked)}
-              style={{ width: '24px', height: '24px', accentColor: colors.primary, flex: 'none' }}
-            />
-            <span>
-              Color-blind friendly colors
-              <span
-                style={{
-                  display: 'block',
-                  fontSize: '13px',
-                  fontWeight: '600',
-                  color: colors.textLight,
-                }}
-              >
-                Guess the Word uses blue and orange instead of green and yellow
-              </span>
-            </span>
-          </label>
+          <Toggle
+            colors={colors}
+            checked={soundOn}
+            onChange={setSoundOn}
+            title="Sound effects"
+            detail="Soft sounds for points, badges and mistakes"
+          />
+          <Toggle
+            colors={colors}
+            checked={colorBlindMode}
+            onChange={setColorBlindMode}
+            title="Color-blind friendly colors"
+            detail="Guess the Word uses blue and orange instead of green and yellow"
+          />
+          {!isInstalled() && (
+            <p
+              style={{
+                margin: '12px 0 0',
+                fontSize: '13px',
+                fontWeight: '600',
+                color: colors.textLight,
+              }}
+            >
+              Play like an app: in your phone's browser, tap Share, then Add to Home Screen. It also
+              keeps your points safe and works without internet.
+            </p>
+          )}
         </Card>
 
         {/* Badges */}

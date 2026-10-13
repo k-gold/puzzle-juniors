@@ -1,6 +1,8 @@
 import { useEffect } from 'react';
 import ShuffleIcon from './ShuffleIcon.jsx';
 import HexButton from './HexButton.jsx';
+import HintButton from './HintButton.jsx';
+import { HINT_COSTS } from '../data/rewards.js';
 import { isPangram, isPositiveMessage } from '../lib/beeRank.js';
 
 const sectionLabel = (colors) => ({
@@ -26,6 +28,8 @@ export default function SpellingBee({
   handleLetterClick,
   outerLetters,
   beeProgress,
+  giveHint,
+  balance,
 }) {
   const canSubmit = !isValidating && currentWord.length >= 3;
   const messageIsGood = isPositiveMessage(message);
@@ -263,6 +267,16 @@ export default function SpellingBee({
           >
             {isValidating ? 'Checking...' : 'Enter'}
           </button>
+        </div>
+
+        <div style={{ marginBottom: '20px' }}>
+          <HintButton
+            colors={colors}
+            cost={HINT_COSTS.spelling}
+            balance={balance}
+            disabled={found >= total}
+            onClick={giveHint}
+          />
         </div>
 
         {/* Found words */}

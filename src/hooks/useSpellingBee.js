@@ -6,13 +6,22 @@ import {
   findPuzzle,
 } from '../data/spellingBeePuzzles.js';
 import { rankProgress, isPangram, isPositiveMessage } from '../lib/beeRank.js';
+import { pickBeeHint } from '../lib/hints.js';
+import { HINT_COSTS } from '../data/rewards.js';
+import { play } from '../lib/sound.js';
 
 // Extra points for a word that uses all seven letters
 const PANGRAM_BONUS = 20;
 
 export function useSpellingBee(savedState, progress) {
-  const { setTotalWordsFound, setGamesCompleted, awardPoints, addCount, calculatePoints } =
-    progress;
+  const {
+    setTotalWordsFound,
+    setGamesCompleted,
+    awardPoints,
+    spendPoints,
+    addCount,
+    calculatePoints,
+  } = progress;
 
   // Spelling Bee state - start with random puzzle if no saved state
   // A saved puzzle that is not playable (an old bug) is replaced along with its found words.
@@ -109,12 +118,20 @@ export function useSpellingBee(savedState, progress) {
       if (foundAfter === answers.length && progressNow.found < answers.length)
         addCount('fullHives');
     } else {
+      play('buzz');
       setMessage('Not in word list');
       setTimeout(() => {
         setMessage('');
         setCurrentWord('');
       }, 1500); // Reduced from 2000ms
     }
+  };
+
+  // Spend points to learn the length and first letters of a word still to find
+  const giveHint = () => {
+    const hint = pickBeeHint(answers, foundWords);
+    if (!hint || !spendPoints(HINT_COSTS.spelling)) return;
+    setMessage(`Hint: try a ${hint.length}-letter word that starts with ${hint.start}`);
   };
 
   const shuffleLetters = () => {
@@ -159,6 +176,7 @@ export function useSpellingBee(savedState, progress) {
     setIsValidating,
     handleSubmit,
     shuffleLetters,
+    giveHint,
     newGame,
     handleLetterClick,
     outerLetters,

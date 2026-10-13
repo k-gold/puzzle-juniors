@@ -3,6 +3,9 @@ import { isValidWord } from '../lib/wordList.js';
 import { WORDLE_WORDS } from '../data/wordleWords.js';
 import { scoreGuess } from '../lib/wordleScoring.js';
 import { shareSquare } from '../lib/wordleColors.js';
+import { pickWordleHint, MAX_WORDLE_HINTS } from '../lib/hints.js';
+import { HINT_COSTS } from '../data/rewards.js';
+import { play } from '../lib/sound.js';
 
 export function useWordle(savedState, progress) {
   const {
@@ -13,6 +16,7 @@ export function useWordle(savedState, progress) {
     wordleStreak,
     setWordleStreak,
     awardPoints,
+    spendPoints,
     addCount,
     colorBlindMode,
   } = progress;
@@ -43,6 +47,12 @@ export function useWordle(savedState, progress) {
   const [wordleGameOver, setWordleGameOver] = useState(savedState?.wordleGameOver || false);
   const [wordleWon, setWordleWon] = useState(savedState?.wordleWon || false);
   const [wordleError, setWordleError] = useState('');
+
+  // Hints are remembered with the word they were for, so a new word starts with none
+  const [hintRecord, setHintRecord] = useState(
+    savedState?.wordleHints || { word: '', positions: [] },
+  );
+  const wordleHintPositions = hintRecord.word === wordleTarget ? hintRecord.positions : [];
 
   // Initialize daily puzzle on mount
   useEffect(() => {
@@ -114,6 +124,7 @@ export function useWordle(savedState, progress) {
         const isValid = await isValidWord(wordleCurrentGuess);
 
         if (!isValid) {
+          play('buzz');
           setWordleError('Not in word list');
           setTimeout(() => {
             setWordleError('');
@@ -216,6 +227,15 @@ export function useWordle(savedState, progress) {
     } else if (wordleCurrentGuess.length < 4) {
       setWordleCurrentGuess((prev) => prev + key);
     }
+  };
+
+  // Wordle: spend points to be shown one letter of the answer, in its place
+  const canGiveWordleHint = !wordleGameOver && wordleHintPositions.length < MAX_WORDLE_HINTS;
+  const giveWordleHint = () => {
+    if (!canGiveWordleHint) return;
+    const position = pickWordleHint(wordleTarget, wordleGuesses, wordleHintPositions);
+    if (position === null || !spendPoints(HINT_COSTS.wordle)) return;
+    setHintRecord({ word: wordleTarget, positions: [...wordleHintPositions, position] });
   };
 
   // Wordle: Switch Mode
@@ -378,6 +398,10 @@ export function useWordle(savedState, progress) {
     switchWordleMode,
     shareWordleResults,
     newWordle,
+    hintRecord,
+    wordleHintPositions,
+    canGiveWordleHint,
+    giveWordleHint,
     getLetterStatus,
     getKeyStatus,
   };

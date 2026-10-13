@@ -1,4 +1,6 @@
 import { useState } from 'react';
+import HintButton from './HintButton.jsx';
+import { HINT_COSTS } from '../data/rewards.js';
 
 export default function WordSearch({
   colors,
@@ -15,6 +17,9 @@ export default function WordSearch({
   isCellSelected,
   isCellInSolution,
   newWordSearch,
+  wsHint,
+  giveSearchHint,
+  balance,
 }) {
   // Keyboard play: a cursor moves over the grid. Space starts a word, arrows stretch it,
   // Space again submits it, Escape cancels.
@@ -87,6 +92,8 @@ export default function WordSearch({
                 background: found ? `${colors.success}1A` : `${colors.primary}12`,
                 color: found ? colors.successText : colors.text,
                 textDecoration: found ? 'line-through' : 'none',
+                outline: wsHint?.word === solution.word ? `2px solid ${colors.primary}` : 'none',
+                outlineOffset: '1px',
                 transition: 'all 0.3s',
               }}
             >
@@ -254,6 +261,11 @@ export default function WordSearch({
                       ? `3px solid ${colors.text}`
                       : 'none',
                   outlineOffset: '-3px',
+                  // The hint circles the first letter of a word still to find
+                  boxShadow:
+                    wsHint?.row === rowIndex && wsHint?.col === colIndex
+                      ? `inset 0 0 0 3px ${colors.primary}`
+                      : 'none',
                   transition: 'background 0.1s',
                   touchAction: 'none',
                 }}
@@ -262,6 +274,20 @@ export default function WordSearch({
               </div>
             )),
           )}
+        </div>
+
+        <div style={{ textAlign: 'center', marginTop: '14px' }}>
+          <HintButton
+            colors={colors}
+            cost={HINT_COSTS.wordsearch}
+            balance={balance}
+            disabled={Boolean(wsHint) || wsFoundWords.length >= wordSearchPuzzle.solutions.length}
+            onClick={giveSearchHint}
+          />
+        </div>
+        <div className="sr-only" aria-live="polite">
+          {wsHint &&
+            `Hint: ${wsHint.word} starts at row ${wsHint.row + 1}, column ${wsHint.col + 1}`}
         </div>
       </div>
     </>

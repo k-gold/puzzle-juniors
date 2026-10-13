@@ -1,5 +1,7 @@
 import { useEffect } from 'react';
 import { wordleStyle } from '../lib/wordleColors.js';
+import HintButton from './HintButton.jsx';
+import { HINT_COSTS } from '../data/rewards.js';
 
 export default function Wordle({
   colors,
@@ -19,6 +21,10 @@ export default function Wordle({
   getLetterStatus,
   getKeyStatus,
   colorBlindMode,
+  wordleHintPositions,
+  canGiveWordleHint,
+  giveWordleHint,
+  balance,
 }) {
   // Let players type on a physical keyboard
   useEffect(() => {
@@ -159,7 +165,10 @@ export default function Wordle({
                   }}
                 >
                   {Array.from({ length: 4 }).map((_, letterIdx) => {
-                    const letter = display[letterIdx] || '';
+                    const typed = display[letterIdx] || '';
+                    // A hint shows its letter, faded, in an empty tile of the row being typed
+                    const hinted = isCurrent && !typed && wordleHintPositions.includes(letterIdx);
+                    const letter = typed || (hinted ? wordleTarget[letterIdx] : '');
                     const status = guess ? getLetterStatus(letterIdx, guess) : null;
                     const tone = status ? wordleStyle(colors, status, colorBlindMode) : null;
 
@@ -167,22 +176,26 @@ export default function Wordle({
                       <div
                         key={letterIdx}
                         aria-label={
-                          letter
-                            ? `${letter}${status ? `, ${status === 'absent' ? 'not in the word' : status === 'present' ? 'in the word, wrong spot' : 'correct'}` : ''}`
-                            : 'empty'
+                          hinted
+                            ? `Hint: letter ${letterIdx + 1} is ${letter}`
+                            : letter
+                              ? `${letter}${status ? `, ${status === 'absent' ? 'not in the word' : status === 'present' ? 'in the word, wrong spot' : 'correct'}` : ''}`
+                              : 'empty'
                         }
                         style={{
                           width: 'min(58px, 15vw)',
                           aspectRatio: '1',
                           boxSizing: 'border-box',
                           background: tone ? tone.background : colors.background,
-                          border: `2px solid ${guess ? 'transparent' : `${colors.textLight}55`}`,
+                          border: hinted
+                            ? `2px dashed ${colors.primary}`
+                            : `2px solid ${guess ? 'transparent' : `${colors.textLight}55`}`,
                           display: 'flex',
                           alignItems: 'center',
                           justifyContent: 'center',
                           fontSize: 'clamp(22px, 7vw, 30px)',
                           fontWeight: '800',
-                          color: tone ? tone.color : colors.text,
+                          color: tone ? tone.color : hinted ? colors.primaryText : colors.text,
                           borderRadius: '12px',
                           transition: 'all 0.2s',
                         }}
@@ -195,6 +208,18 @@ export default function Wordle({
               );
             })}
           </div>
+
+          {!wordleGameOver && (
+            <div style={{ textAlign: 'center', marginBottom: '12px' }}>
+              <HintButton
+                colors={colors}
+                cost={HINT_COSTS.wordle}
+                balance={balance}
+                disabled={!canGiveWordleHint}
+                onClick={giveWordleHint}
+              />
+            </div>
+          )}
 
           {/* Game Over Messages */}
           {wordleGameOver && wordleWon && wordleMode === 'daily' && (

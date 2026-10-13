@@ -50,6 +50,12 @@ npm run build
 
 The tests include a smoke test that renders every screen, so a change that breaks a screen fails the build before it reaches players.
 
+## Offline, home screen and sound
+
+The site works offline and can be added to a phone's home screen (on iPhone: Safari, Share, Add to Home Screen). No app store or developer account is involved. At build time `scripts/precache-plugin.mjs` writes `dist/sw.js`, a small service worker that saves every built file, so there is nothing to maintain by hand. Page loads try the network first, so new versions arrive as soon as a player is online. The app icon is `public/icons/app-icon.svg`, rendered to the PNG sizes listed in `public/manifest.webmanifest`.
+
+Sound effects are made in the browser (`src/lib/sound.js`), so there are no sound files. They are off until a player turns them on in Rewards, Settings.
+
 ## Project layout
 
 ```
@@ -60,7 +66,7 @@ src/
   components/           One file per screen, plus Header, Notifications, HexButton
   hooks/                Game state and rules: useProgress, useSpellingBee, useWordSearch, useWordle
   data/                 Word lists, puzzles, color themes, reward catalogs
-  lib/                  Word check, Word Search generator, Wordle scoring, ranks, colors, storage, analytics
+  lib/                  Word check, Word Search generator, Wordle scoring, ranks, hints, sound, colors, badge stats, storage, analytics
 public/
   words.txt             Dictionary used to check guesses (see below)
   icons/                Tab icons
@@ -86,6 +92,8 @@ This rewrites `src/data/beePuzzleList.js` with the letters, a center letter, and
 Players' saved puzzles must be one of the puzzles in the list. If you remove a puzzle, anyone halfway through it gets a new one.
 
 **Add a badge.** Add one line to `BADGES` in `src/data/rewards.js`: an id, name, icon, description, the stat it is measured by, and the target. The stats are listed in `src/lib/badgeStats.js`. For something new to count (say, a new kind of win), add a name to `counters` in `src/hooks/useProgress.js`, call `addCount('name')` where it happens, and expose it in `badgeStats.js`. Badges are awarded by one check in `src/hooks/useBadges.js`, so players who already qualify get a new badge the next time they open the site. The tests make sure every badge points at a real stat.
+
+**Hints.** Each game has a Hint button that costs points: `HINT_COSTS` in `src/data/rewards.js` (Letter Puzzle 10, Word Search 15, Guess the Word 20). What a hint reveals is chosen in `src/lib/hints.js`. Points are tracked as total earned (`points`, which drives unlocks and badges and only goes up) and points spent (`spentPoints`). The number players see is the balance, earned minus spent.
 
 **Points and bonuses.** Points per word come from `calculatePoints` in `src/hooks/useProgress.js`. Bonuses: 20 for a pangram (`PANGRAM_BONUS` in `useSpellingBee.js`), 25 for finishing a Word Search (`FINISH_BONUS` in `useWordSearch.js`), and for winning the daily Wordle 10 plus 5 per day of streak, up to 25 extra (`useWordle.js`).
 

@@ -27,4 +27,4 @@ export function rankProgress(found, total) {
 }
 
 // Messages that should be shown as good news
-export const isPositiveMessage = (message) => /^(Great|Nice|Pangram|Checking)/.test(message);
+export const isPositiveMessage = (message) => /^(Great|Nice|Pangram|Checking|Hint)/.test(message);

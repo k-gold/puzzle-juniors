@@ -48,6 +48,8 @@ export default function App() {
     unlockedVisualThemes,
     currentVisualTheme,
     colorBlindMode,
+    spentPoints,
+    soundOn,
     counters,
     lastPlayedDate,
     wsMisses,
@@ -74,6 +76,7 @@ export default function App() {
     wordleGuesses,
     wordleGameOver,
     wordleWon,
+    hintRecord,
   } = ctx;
   // Save state to localStorage whenever it changes
   useEffect(() => {
@@ -87,6 +90,8 @@ export default function App() {
       unlockedVisualThemes,
       currentVisualTheme,
       colorBlindMode,
+      spentPoints,
+      soundOn,
       counters,
       lastPlayedDate,
       wsMisses,
@@ -113,6 +118,7 @@ export default function App() {
       wordleGuesses,
       wordleGameOver,
       wordleWon,
+      wordleHints: hintRecord,
     };
 
     saveState(stateToSave);
@@ -126,6 +132,8 @@ export default function App() {
     unlockedVisualThemes,
     currentVisualTheme,
     colorBlindMode,
+    spentPoints,
+    soundOn,
     counters,
     lastPlayedDate,
     wsMisses,
@@ -152,6 +160,7 @@ export default function App() {
     wordleGuesses,
     wordleGameOver,
     wordleWon,
+    hintRecord,
   ]);
 
   return (

@@ -9,7 +9,7 @@ export default function Header({
   colors,
   activeGame,
   setActiveGame,
-  points,
+  balance,
   wordleMode,
   switchWordleMode,
   newGame,
@@ -89,7 +89,7 @@ export default function Header({
 
         <button
           onClick={() => setActiveGame('store')}
-          aria-label={`${points} points. Open rewards`}
+          aria-label={`${balance} points to spend. Open rewards`}
           style={{
             display: 'flex',
             alignItems: 'center',
@@ -106,7 +106,7 @@ export default function Header({
           <span style={{ fontSize: '16px', lineHeight: 1 }} aria-hidden="true">
             ⭐
           </span>
-          <span style={{ fontSize: '16px', fontWeight: '800', color: colors.text }}>{points}</span>
+          <span style={{ fontSize: '16px', fontWeight: '800', color: colors.text }}>{balance}</span>
         </button>
       </div>
 
