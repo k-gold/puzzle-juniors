@@ -223,7 +223,8 @@ export default function Rewards({
             color: colors.textLight,
           }}
         >
-          Points to spend on hints. Unlocks use everything you have earned: {points} so far.
+          Points to spend on Guess the Word hints. Unlocks use everything you have earned: {points}{' '}
+          so far.
         </p>
 
         <div

@@ -1,7 +1,5 @@
 import { useState } from 'react';
 import { generateWordSearchPuzzle } from '../lib/wordSearch.js';
-import { pickSearchHint } from '../lib/hints.js';
-import { HINT_COSTS } from '../data/rewards.js';
 import { play } from '../lib/sound.js';
 
 // Extra points for finding the last word of a puzzle
@@ -13,7 +11,6 @@ export function useWordSearch(savedState, progress) {
     setTotalWordsFound,
     setGamesCompleted,
     awardPoints,
-    spendPoints,
     addCount,
     calculatePoints,
   } = progress;
@@ -25,8 +22,6 @@ export function useWordSearch(savedState, progress) {
   const [wsFoundWords, setWsFoundWords] = useState(savedState?.wsFoundWords || []);
   // Wrong guesses in this puzzle (a puzzle with none earns the Sharp Eyes badge)
   const [wsMisses, setWsMisses] = useState(savedState?.wsMisses || 0);
-  // Hint: the first letter of one word still to find is circled
-  const [wsHint, setWsHint] = useState(null);
   const [wsSelectedCells, setWsSelectedCells] = useState([]);
   const [isSelecting, setIsSelecting] = useState(false);
 
@@ -159,18 +154,10 @@ export function useWordSearch(savedState, progress) {
     return false;
   };
 
-  // A hint stays up until its word is found
-  const activeHint = wsHint && !wsFoundWords.includes(wsHint.word) ? wsHint : null;
-  const giveSearchHint = () => {
-    const hint = pickSearchHint(wordSearchPuzzle.solutions, wsFoundWords);
-    if (hint && spendPoints(HINT_COSTS.wordsearch)) setWsHint(hint);
-  };
-
   const newWordSearch = () => {
     setWordSearchPuzzle(generateWordSearchPuzzle(unlockedThemes));
     setWsFoundWords([]);
     setWsMisses(0);
-    setWsHint(null);
     setWsSelectedCells([]);
 
     setGamesCompleted((prev) => ({ ...prev, wordsearch: (prev.wordsearch || 0) + 1 }));
@@ -182,8 +169,6 @@ export function useWordSearch(savedState, progress) {
     wsFoundWords,
     setWsFoundWords,
     wsMisses,
-    wsHint: activeHint,
-    giveSearchHint,
     wsSelectedCells,
     setWsSelectedCells,
     isSelecting,

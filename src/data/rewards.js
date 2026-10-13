@@ -1,7 +1,7 @@
 // Catalogs shown on the Rewards page: what can be unlocked and what it costs.
 
-// Points a hint costs in each game
-export const HINT_COSTS = { spelling: 10, wordsearch: 15, wordle: 20 };
+// Points a Guess the Word hint costs
+export const HINT_COST = 20;
 
 export const WORD_SEARCH_THEMES = [
   { id: 'space', name: 'Space', points: 0, icon: '🚀' },

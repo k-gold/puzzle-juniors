@@ -26,7 +26,7 @@ export default function HintButton({ colors, cost, balance, disabled, onClick })
         touchAction: 'manipulation',
       }}
     >
-      {cannotAfford ? `Hint: need ${cost} pts` : `Hint (${cost} pts)`}
+      Hint
     </button>
   );
 }

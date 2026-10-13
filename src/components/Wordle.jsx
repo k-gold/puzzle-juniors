@@ -1,7 +1,7 @@
 import { useEffect } from 'react';
 import { wordleStyle } from '../lib/wordleColors.js';
 import HintButton from './HintButton.jsx';
-import { HINT_COSTS } from '../data/rewards.js';
+import { HINT_COST } from '../data/rewards.js';
 
 export default function Wordle({
   colors,
@@ -213,7 +213,7 @@ export default function Wordle({
             <div style={{ textAlign: 'center', marginBottom: '12px' }}>
               <HintButton
                 colors={colors}
-                cost={HINT_COSTS.wordle}
+                cost={HINT_COST}
                 balance={balance}
                 disabled={!canGiveWordleHint}
                 onClick={giveWordleHint}

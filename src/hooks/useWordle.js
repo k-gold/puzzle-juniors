@@ -4,7 +4,7 @@ import { WORDLE_WORDS } from '../data/wordleWords.js';
 import { scoreGuess } from '../lib/wordleScoring.js';
 import { shareSquare } from '../lib/wordleColors.js';
 import { pickWordleHint, MAX_WORDLE_HINTS } from '../lib/hints.js';
-import { HINT_COSTS } from '../data/rewards.js';
+import { HINT_COST } from '../data/rewards.js';
 import { play } from '../lib/sound.js';
 
 export function useWordle(savedState, progress) {
@@ -234,7 +234,7 @@ export function useWordle(savedState, progress) {
   const giveWordleHint = () => {
     if (!canGiveWordleHint) return;
     const position = pickWordleHint(wordleTarget, wordleGuesses, wordleHintPositions);
-    if (position === null || !spendPoints(HINT_COSTS.wordle)) return;
+    if (position === null || !spendPoints(HINT_COST)) return;
     setHintRecord({ word: wordleTarget, positions: [...wordleHintPositions, position] });
   };
 
