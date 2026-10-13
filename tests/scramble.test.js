@@ -33,8 +33,38 @@ test('tiles hold the same letters as the word, in a different order', () => {
   }
 });
 
+test('no two words share a picture', () => {
+  const pictures = SCRAMBLE_WORDS.map(([, emoji]) => emoji.replace(/\uFE0F/g, ''));
+  assert.equal(new Set(pictures).size, pictures.length);
+});
+
+test('there are plenty of words', () => {
+  assert.ok(SCRAMBLE_WORDS.length >= 200, `only ${SCRAMBLE_WORDS.length} words`);
+});
+
 test('a round has five different words', () => {
-  const round = pickRound(SCRAMBLE_WORDS);
+  const { round } = pickRound(SCRAMBLE_WORDS);
   assert.equal(round.length, ROUND_LENGTH);
   assert.equal(new Set(round.map((r) => r.word)).size, ROUND_LENGTH);
+});
+
+test('words do not come up again until every word has been played', () => {
+  let seen = [];
+  const played = [];
+  const rounds = Math.floor(SCRAMBLE_WORDS.length / ROUND_LENGTH);
+  for (let i = 0; i < rounds; i++) {
+    const picked = pickRound(SCRAMBLE_WORDS, seen);
+    played.push(...picked.round.map((r) => r.word));
+    seen = picked.seen;
+  }
+  assert.equal(new Set(played).size, played.length);
+});
+
+test('when few words are left, the round is filled from played ones and the list starts over', () => {
+  const words = [...SCRAMBLE_WORDS];
+  const seen = words.slice(2).map(([w]) => w); // only the first two are unplayed
+  const { round, seen: next } = pickRound(words, seen);
+  assert.equal(new Set(round.map((r) => r.word)).size, ROUND_LENGTH);
+  assert.ok(round.some((r) => r.word === words[0][0]) && round.some((r) => r.word === words[1][0]));
+  assert.equal(next.length, ROUND_LENGTH - 2);
 });

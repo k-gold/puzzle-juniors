@@ -24,9 +24,26 @@ export function scrambleTiles(word, random = Math.random) {
   return mixed;
 }
 
-// `count` different words for one round
-export function pickRound(words, count = ROUND_LENGTH, random = Math.random) {
-  return shuffle(words, random)
-    .slice(0, count)
-    .map(([word, emoji]) => ({ word, emoji }));
+// `count` different words for one round, and the updated list of words played so far.
+// Words that have not come up yet are used first. When fewer than `count` are left, they are
+// used up and the rest of the round is filled from words played before, and the list starts over.
+export function pickRound(words, seen = [], count = ROUND_LENGTH, random = Math.random) {
+  const unseen = words.filter(([word]) => !seen.includes(word));
+  let chosen;
+  let nextSeen;
+  if (unseen.length >= count) {
+    chosen = shuffle(unseen, random).slice(0, count);
+    nextSeen = [...seen, ...chosen.map(([word]) => word)];
+  } else {
+    const filler = shuffle(
+      words.filter(([word]) => seen.includes(word)),
+      random,
+    ).slice(0, count - unseen.length);
+    chosen = [...shuffle(unseen, random), ...filler];
+    nextSeen = filler.map(([word]) => word);
+  }
+  return {
+    round: chosen.map(([word, emoji]) => ({ word, emoji })),
+    seen: nextSeen,
+  };
 }

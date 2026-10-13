@@ -8,7 +8,9 @@ export function useScramble(savedState, progress) {
   const { setTotalWordsFound, setGamesCompleted, awardPoints, addCount, calculatePoints } =
     progress;
 
-  const [round, setRound] = useState(() => pickRound(SCRAMBLE_WORDS));
+  const [first] = useState(() => pickRound(SCRAMBLE_WORDS, savedState?.scrambleSeen));
+  const [round, setRound] = useState(first.round);
+  const [seen, setSeen] = useState(first.seen); // words played since the list last started over
   const [index, setIndex] = useState(0);
   const [tiles, setTiles] = useState(() => scrambleTiles(round[0].word));
   const [placed, setPlaced] = useState([]); // tile ids, in the order they were tapped
@@ -94,8 +96,10 @@ export function useScramble(savedState, progress) {
   };
 
   const newRound = () => {
-    const next = pickRound(SCRAMBLE_WORDS);
+    const picked = pickRound(SCRAMBLE_WORDS, seen);
+    const next = picked.round;
     setRound(next);
+    setSeen(picked.seen);
     setMistakes(0);
     setSolved(0);
     setRoundPoints(0);
@@ -105,6 +109,7 @@ export function useScramble(savedState, progress) {
   };
 
   return {
+    scrambleSeen: seen,
     scrambleWord: current,
     scrambleIndex: index,
     scrambleRoundLength: round.length,
