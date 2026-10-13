@@ -3,8 +3,9 @@
 Kid-friendly word games, live at https://puzzlejuniors.com.
 
 - **Letter Puzzle:** a honeycomb spelling game. Make words from seven letters, always using the center one. Every puzzle hides a word that uses all seven letters (a pangram, worth bonus points), and players earn the ranks Beginner, Good and Great by finding a share of the puzzle's kid-friendly answer list.
-- **Word Search:** find the hidden words in a 10x10 grid. Themes unlock as points are earned.
+- **Word Search:** find the hidden words in a 10x10 grid. Themes unlock as points are earned. A Print button makes a black and white sheet (puzzle and word list, then an answer key) that can also be saved as a PDF from the print dialog.
 - **Guess the Word:** a four-letter word guessing game, with a Daily puzzle and unlimited Practice.
+- **Word Scramble:** five words a round. Tap the mixed-up letter tiles to spell the word shown by the emoji picture.
 - **Rewards:** points, badges, unlockable word search themes and color themes.
 
 Everything runs in the browser. There is no server and no account system. Progress is saved in the player's own browser (`localStorage`).
@@ -78,6 +79,8 @@ tests/                  Tests, run with node:test
 
 **Add a Wordle answer.** Add a four-letter uppercase word to the end of `src/data/wordleWords.js`. The word must also be in `public/words.txt`, or the puzzle could not be won, and it must not already be in the list. The tests check all three. The daily puzzle picks its word by position in this list, so do not reorder or remove words that have already been used: that would change what players see on days they have already played.
 
+**Add a Word Scramble word.** Add a `['WORD', '🙂']` pair to `src/data/scrambleWords.js`: 3 to 7 capital letters, a picture that only one word fits, and the word must be in `public/words.txt`. The tests check the length, letters, dictionary and duplicates. Round length and the perfect round bonus are in `src/lib/scramble.js`.
+
 **Add a Word Search theme.** Add its words to `src/data/wordSearchWords.js` and its card (name, icon, points needed) to `WORD_SEARCH_THEMES` in `src/data/rewards.js`. Themes unlock by themselves when a player's points reach the number on the card. Words must be 10 letters or fewer. The tests check that both lists match.
 
 **Add a Letter Puzzle.** Puzzles are generated, not typed by hand. Add a 7-letter word that has seven different letters to the `PANGRAMS` list in `scripts/build-bee-puzzles.mjs`, then run:
@@ -95,7 +98,7 @@ Players' saved puzzles must be one of the puzzles in the list. If you remove a p
 
 **Hints.** Guess the Word has a Hint button that costs points (`HINT_COST` in `src/data/rewards.js`) and shows one letter of the answer in its place, up to twice per word. What it reveals is chosen in `src/lib/hints.js`. Points are tracked as total earned (`points`, which drives unlocks and badges and only goes up) and points spent (`spentPoints`). The number players see is the balance, earned minus spent.
 
-**Points and bonuses.** Points per word come from `calculatePoints` in `src/hooks/useProgress.js`. Bonuses: 20 for a pangram (`PANGRAM_BONUS` in `useSpellingBee.js`), 25 for finishing a Word Search (`FINISH_BONUS` in `useWordSearch.js`), and for winning the daily Wordle 10 plus 5 per day of streak, up to 25 extra (`useWordle.js`).
+**Points and bonuses.** Points per word come from `calculatePoints` in `src/hooks/useProgress.js`. Bonuses: 20 for a pangram (`PANGRAM_BONUS` in `useSpellingBee.js`), 25 for finishing a Word Search (`FINISH_BONUS` in `useWordSearch.js`), 20 for a Word Scramble round with no wrong tries or skips (`PERFECT_ROUND_BONUS` in `src/lib/scramble.js`), and for winning the daily Wordle 10 plus 5 per day of streak, up to 25 extra (`useWordle.js`).
 
 **Add a color theme.** Add the colors to `src/data/colorThemes.js` and its card to `VISUAL_THEMES` in `src/data/rewards.js`.
 

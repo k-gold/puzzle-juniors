@@ -492,4 +492,28 @@ export const BADGES = [
     stat: 'colorThemes',
     target: 12,
   },
+  {
+    id: 'tile-tamer',
+    name: 'Tile Tamer',
+    icon: '🔤',
+    desc: 'Unscramble 10 words in Word Scramble.',
+    stat: 'scrambleWords',
+    target: 10,
+  },
+  {
+    id: 'scramble-pro',
+    name: 'Scramble Pro',
+    icon: '🧩',
+    desc: 'Unscramble 50 words in Word Scramble.',
+    stat: 'scrambleWords',
+    target: 50,
+  },
+  {
+    id: 'perfect-round',
+    name: 'Perfect Round',
+    icon: '💯',
+    desc: 'Finish a Word Scramble round with no mistakes or skips.',
+    stat: 'perfectRounds',
+    target: 1,
+  },
 ];

@@ -8,6 +8,7 @@ export function useProgress(savedState) {
   const [spellingPoints, setSpellingPoints] = useState(savedState?.spellingPoints || 0);
   const [wordSearchPoints, setWordSearchPoints] = useState(savedState?.wordSearchPoints || 0);
   const [wordlePoints, setWordlePoints] = useState(savedState?.wordlePoints || 0);
+  const [scramblePoints, setScramblePoints] = useState(savedState?.scramblePoints || 0);
   // `points` is everything the player has earned. It decides unlocks and badges, so it only ever
   // goes up. Spending on hints is tracked separately, and the balance is what is left to spend.
   const [spentPoints, setSpentPoints] = useState(savedState?.spentPoints || 0);
@@ -55,6 +56,8 @@ export function useProgress(savedState) {
     fastWins: 0,
     eWins: 0,
     daysPlayed: 0,
+    scrambleWords: 0,
+    perfectRounds: 0,
     ...savedState?.counters,
   });
   const [lastPlayedDate, setLastPlayedDate] = useState(savedState?.lastPlayedDate || '');
@@ -104,6 +107,8 @@ export function useProgress(savedState) {
       setWordSearchPoints((prev) => prev + amount);
     } else if (gameType === 'wordle') {
       setWordlePoints((prev) => prev + amount);
+    } else if (gameType === 'scramble') {
+      setScramblePoints((prev) => prev + amount);
     }
 
     // Count each day the player earns points on
@@ -135,6 +140,8 @@ export function useProgress(savedState) {
     setWordSearchPoints,
     wordlePoints,
     setWordlePoints,
+    scramblePoints,
+    setScramblePoints,
     showPointsAnimation,
     setShowPointsAnimation,
     animatedPoints,

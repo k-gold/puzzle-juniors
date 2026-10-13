@@ -2,6 +2,7 @@ const TABS = [
   { id: 'spelling', label: 'Letters', icon: '/icons/spelling-bee.png' },
   { id: 'wordsearch', label: 'Search', icon: '/icons/word-search.png' },
   { id: 'wordle', label: 'Guess', icon: '/icons/wordle.png' },
+  { id: 'scramble', label: 'Scramble', icon: '/icons/scramble.png' },
   { id: 'store', label: 'Rewards', icon: '/icons/store.png' },
 ];
 
@@ -15,6 +16,7 @@ export default function Header({
   newGame,
   newWordSearch,
   newWordle,
+  newScrambleRound,
 }) {
   const handleNewGame = () => {
     if (activeGame === 'spelling') {
@@ -27,6 +29,8 @@ export default function Header({
         switchWordleMode('practice');
       }
       newWordle();
+    } else if (activeGame === 'scramble') {
+      newScrambleRound();
     }
   };
 

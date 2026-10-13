@@ -54,3 +54,78 @@ button:focus-visible {
   white-space: nowrap;
   border: 0;
 }
+
+/* Printable Word Search (src/components/PrintSheet.jsx): hidden on screen, the only thing printed */
+.print-sheet {
+  display: none;
+}
+
+@media print {
+  #root {
+    display: none;
+  }
+  .print-sheet {
+    display: block;
+    color: #000;
+    background: #fff;
+    font-family: var(--font);
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+  .print-page {
+    text-align: center;
+  }
+  .print-key {
+    break-before: page;
+  }
+  .print-sheet h1 {
+    font-size: 24pt;
+    margin: 0 0 10pt;
+  }
+  .print-line {
+    font-size: 12pt;
+    margin: 0 0 16pt;
+  }
+  .print-grid {
+    border-collapse: collapse;
+    margin: 0 auto 16pt;
+  }
+  .print-grid td {
+    width: 1.9cm;
+    height: 1.9cm;
+    border: 1px solid #999;
+    text-align: center;
+    font-size: 22pt;
+    font-weight: 700;
+  }
+  /* Gray fill, plus underline so the answers still show on a black and white printer */
+  .print-grid td.print-answer {
+    background: #d4d4d4;
+    text-decoration: underline;
+  }
+  .print-note {
+    font-size: 12pt;
+    margin: 0 0 8pt;
+  }
+  .print-words {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    columns: 3;
+    text-align: left;
+    font-size: 14pt;
+    font-weight: 700;
+    line-height: 1.8;
+  }
+  .print-words li {
+    break-inside: avoid;
+  }
+  .print-box {
+    display: inline-block;
+    width: 0.9em;
+    height: 0.9em;
+    border: 1.5px solid #000;
+    vertical-align: -0.1em;
+    margin-right: 0.3em;
+  }
+}

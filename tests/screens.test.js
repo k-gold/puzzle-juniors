@@ -18,6 +18,7 @@ const SCREENS = [
   ['spelling', 'Letter Puzzle'],
   ['wordsearch', 'Find Words'],
   ['wordle', 'Guess the Word'],
+  ['scramble', 'Word Scramble'],
   ['store', 'Rewards'],
 ];
 

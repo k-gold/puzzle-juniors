@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import PrintSheet from './PrintSheet.jsx';
 
 export default function WordSearch({
   colors,
@@ -264,6 +265,27 @@ export default function WordSearch({
           )}
         </div>
       </div>
+
+      <div style={{ textAlign: 'center' }}>
+        <button
+          onClick={() => window.print()}
+          style={{
+            minHeight: '48px',
+            padding: '0 22px',
+            background: `${colors.primary}14`,
+            color: colors.primaryText,
+            border: 'none',
+            borderRadius: '999px',
+            fontSize: '15px',
+            fontWeight: '700',
+            cursor: 'pointer',
+            touchAction: 'manipulation',
+          }}
+        >
+          Print this puzzle
+        </button>
+      </div>
+      <PrintSheet wordSearchPuzzle={wordSearchPuzzle} />
     </>
   );
 }

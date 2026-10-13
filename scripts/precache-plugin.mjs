@@ -15,6 +15,7 @@ const EXTRA_FILES = [
   '/icons/spelling-bee.png',
   '/icons/word-search.png',
   '/icons/wordle.png',
+  '/icons/scramble.png',
   '/icons/store.png',
 ];
 

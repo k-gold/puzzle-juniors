@@ -40,6 +40,8 @@ export function buildStats({
     fastWins: counters.fastWins,
     eWins: counters.eWins,
     daysPlayed: counters.daysPlayed,
+    scrambleWords: counters.scrambleWords,
+    perfectRounds: counters.perfectRounds,
   };
 }
 
