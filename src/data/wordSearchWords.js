@@ -211,7 +211,7 @@ export const WORD_LISTS_BY_THEME = {
     'COCOA',
     'MITTENS',
     'SCARF',
-    'GIFT',
+    'BOOTS',
     'ICICLE',
     'COZY',
     'SKATE',

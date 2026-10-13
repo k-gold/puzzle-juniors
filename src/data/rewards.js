@@ -68,7 +68,7 @@ export const SEASONS = [
   },
   {
     id: 'winter',
-    name: 'Winter Holidays',
+    name: 'Winter',
     icon: '⛄',
     start: [12, 1],
     end: [12, 31],
