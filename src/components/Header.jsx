@@ -3,6 +3,7 @@ const TABS = [
   { id: 'wordsearch', label: 'Search', icon: '/icons/word-search.png' },
   { id: 'wordle', label: 'Guess', icon: '/icons/wordle.png' },
   { id: 'scramble', label: 'Scramble', icon: '/icons/scramble.png' },
+  { id: 'crossword', label: 'Cross', icon: '/icons/crossword.png' },
   { id: 'store', label: 'Rewards', icon: '/icons/store.png' },
 ];
 
@@ -17,6 +18,7 @@ export default function Header({
   newWordSearch,
   newWordle,
   newScrambleRound,
+  newCrossword,
 }) {
   const handleNewGame = () => {
     if (activeGame === 'spelling') {
@@ -31,6 +33,8 @@ export default function Header({
       newWordle();
     } else if (activeGame === 'scramble') {
       newScrambleRound();
+    } else if (activeGame === 'crossword') {
+      newCrossword();
     }
   };
 

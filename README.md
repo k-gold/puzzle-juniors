@@ -6,6 +6,7 @@ Kid-friendly word games, live at https://puzzlejuniors.com.
 - **Word Search:** find the hidden words in a 10x10 grid. Themes unlock as points are earned. A Print button makes a black and white sheet (puzzle and word list, then an answer key) that can also be saved as a PDF from the print dialog.
 - **Guess the Word:** a four-letter word guessing game, with a Daily puzzle and unlimited Practice.
 - **Word Scramble:** five words a round. Tap the mixed-up letter tiles to spell the word shown by the emoji picture.
+- **Mini Crossword:** 5x5 crosswords with text clues. Tap a square and type (on screen or on a keyboard). Each word checks itself when it is full: a right word locks in green, a wrong one clears.
 - **Seasonal themes:** opening the game during Valentine's, Spring, Summer and School, Halloween or Winter unlocks that season's Word Search theme and color theme for good. While a season is on, its Word Search comes up about half the time.
 - **Rewards:** points, badges, unlockable word search themes and color themes.
 
@@ -82,6 +83,8 @@ tests/                  Tests, run with node:test
 
 **Add a Word Scramble word.** Add a `['WORD', '🙂']` pair to `src/data/scrambleWords.js`: 3 to 7 capital letters, a picture that only one word fits, and the word must be in `public/words.txt`. The tests check the length, letters, dictionary and duplicates. Round length and the perfect round bonus are in `src/lib/scramble.js`.
 
+**Add a Mini Crossword.** Add a grid to `GRIDS` in `src/data/crosswordPuzzles.js`: five rows of five letters joined by `/`, with `#` for black squares (for example `CAR##/A#HAY/...`). Every run of 3 or more letters, across and down, is a word, and runs of exactly 2 are not allowed. Each word needs a kid-friendly clue in `CLUES` under the word itself (clues are shared by every puzzle that uses the word). The tests check the shape, that every white square is in a word, that every word is in `public/words.txt` and has a clue, and that no clue contains its own answer.
+
 **Change or add a season.** Seasons are in `SEASONS` in `src/data/rewards.js` (dates are [month, day], must not overlap). Each needs a word list in `src/data/wordSearchWords.js` and a color theme in `src/data/colorThemes.js`, both under the season's id. The tests check dates, word lists and color themes. Earned seasons are saved as `seasonsEarned`.
 
 **Add a Word Search theme.** Add its words to `src/data/wordSearchWords.js` and its card (name, icon, points needed) to `WORD_SEARCH_THEMES` in `src/data/rewards.js`. Themes unlock by themselves when a player's points reach the number on the card. Words must be 10 letters or fewer. The tests check that both lists match.
@@ -101,7 +104,7 @@ Players' saved puzzles must be one of the puzzles in the list. If you remove a p
 
 **Hints.** Guess the Word has a Hint button that costs points (`HINT_COST` in `src/data/rewards.js`) and shows one letter of the answer in its place, up to twice per word. What it reveals is chosen in `src/lib/hints.js`. Points are tracked as total earned (`points`, which drives unlocks and badges and only goes up) and points spent (`spentPoints`). The number players see is the balance, earned minus spent.
 
-**Points and bonuses.** Points per word come from `calculatePoints` in `src/hooks/useProgress.js`. Bonuses: 20 for a pangram (`PANGRAM_BONUS` in `useSpellingBee.js`), 25 for finishing a Word Search (`FINISH_BONUS` in `useWordSearch.js`), 20 for a Word Scramble round with no wrong tries or skips (`PERFECT_ROUND_BONUS` in `src/lib/scramble.js`), and for winning the daily Wordle 10 plus 5 per day of streak, up to 25 extra (`useWordle.js`).
+**Points and bonuses.** Points per word come from `calculatePoints` in `src/hooks/useProgress.js`. Bonuses: 20 for a pangram (`PANGRAM_BONUS` in `useSpellingBee.js`), 25 for finishing a Word Search (`FINISH_BONUS` in `useWordSearch.js`), 25 for finishing a Mini Crossword (`CROSSWORD_FINISH_BONUS` in `src/lib/crossword.js`), 20 for a Word Scramble round with no wrong tries or skips (`PERFECT_ROUND_BONUS` in `src/lib/scramble.js`), and for winning the daily Wordle 10 plus 5 per day of streak, up to 25 extra (`useWordle.js`).
 
 **Add a color theme.** Add the colors to `src/data/colorThemes.js` and its card to `VISUAL_THEMES` in `src/data/rewards.js`.
 

@@ -10,6 +10,7 @@ export function useProgress(savedState) {
   const [wordSearchPoints, setWordSearchPoints] = useState(savedState?.wordSearchPoints || 0);
   const [wordlePoints, setWordlePoints] = useState(savedState?.wordlePoints || 0);
   const [scramblePoints, setScramblePoints] = useState(savedState?.scramblePoints || 0);
+  const [crosswordPoints, setCrosswordPoints] = useState(savedState?.crosswordPoints || 0);
   // `points` is everything the player has earned. It decides unlocks and badges, so it only ever
   // goes up. Spending on hints is tracked separately, and the balance is what is left to spend.
   const [spentPoints, setSpentPoints] = useState(savedState?.spentPoints || 0);
@@ -59,6 +60,8 @@ export function useProgress(savedState) {
     daysPlayed: 0,
     scrambleWords: 0,
     perfectRounds: 0,
+    crosswordsFinished: 0,
+    cleanCrosswords: 0,
     ...savedState?.counters,
   });
   const [lastPlayedDate, setLastPlayedDate] = useState(savedState?.lastPlayedDate || '');
@@ -97,7 +100,7 @@ export function useProgress(savedState) {
     if (!activeSeason || seasonsEarned.includes(activeSeason)) return;
     const season = SEASONS.find((s) => s.id === activeSeason);
     setSeasonsEarned((prev) => [...prev, activeSeason]);
-    notify({ icon: season.icon, title: 'Seasonal Theme Unlocked!', name: season.name });
+    notify({ icon: season.icon, title: 'Season Unlocked!', name: season.name });
   }, [activeSeason]);
   // Every Word Search theme a new puzzle can use
   const wordSearchThemes = [...unlockedThemes, ...seasonsEarned];
@@ -122,6 +125,8 @@ export function useProgress(savedState) {
       setWordlePoints((prev) => prev + amount);
     } else if (gameType === 'scramble') {
       setScramblePoints((prev) => prev + amount);
+    } else if (gameType === 'crossword') {
+      setCrosswordPoints((prev) => prev + amount);
     }
 
     // Count each day the player earns points on
@@ -155,6 +160,8 @@ export function useProgress(savedState) {
     setWordlePoints,
     scramblePoints,
     setScramblePoints,
+    crosswordPoints,
+    setCrosswordPoints,
     showPointsAnimation,
     setShowPointsAnimation,
     animatedPoints,

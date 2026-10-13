@@ -6,6 +6,7 @@ import { useSpellingBee } from './hooks/useSpellingBee.js';
 import { useWordSearch } from './hooks/useWordSearch.js';
 import { useWordle } from './hooks/useWordle.js';
 import { useScramble } from './hooks/useScramble.js';
+import { useCrossword } from './hooks/useCrossword.js';
 import { useBadges } from './hooks/useBadges.js';
 import Header from './components/Header.jsx';
 import Notifications from './components/Notifications.jsx';
@@ -13,6 +14,7 @@ import SpellingBee from './components/SpellingBee.jsx';
 import WordSearch from './components/WordSearch.jsx';
 import Wordle from './components/Wordle.jsx';
 import Scramble from './components/Scramble.jsx';
+import Crossword from './components/Crossword.jsx';
 import Rewards from './components/Rewards.jsx';
 
 export default function App() {
@@ -28,6 +30,7 @@ export default function App() {
   const colors = COLOR_THEMES[progress.currentVisualTheme] || COLOR_THEMES.classic;
   const wordle = useWordle(savedState, progress);
   const scramble = useScramble(savedState, progress);
+  const crossword = useCrossword(savedState, progress);
 
   // Everything a screen might need. Each screen picks what it uses.
   const ctx = {
@@ -39,6 +42,7 @@ export default function App() {
     ...wordSearch,
     ...wordle,
     ...scramble,
+    ...crossword,
   };
   useBadges(ctx);
 
@@ -49,6 +53,8 @@ export default function App() {
     wordSearchPoints,
     wordlePoints,
     scramblePoints,
+    crosswordPoints,
+    crosswordState,
     unlockedThemes,
     seasonsEarned,
     unlockedVisualThemes,
@@ -93,6 +99,8 @@ export default function App() {
       wordSearchPoints,
       wordlePoints,
       scramblePoints,
+      crosswordPoints,
+      crossword: crosswordState,
       unlockedThemes,
       seasonsEarned,
       unlockedVisualThemes,
@@ -137,6 +145,8 @@ export default function App() {
     wordSearchPoints,
     wordlePoints,
     scramblePoints,
+    crosswordPoints,
+    crosswordState,
     unlockedThemes,
     seasonsEarned,
     unlockedVisualThemes,
@@ -250,6 +260,7 @@ export default function App() {
           {activeGame === 'wordsearch' && <WordSearch {...ctx} />}
           {activeGame === 'wordle' && <Wordle {...ctx} />}
           {activeGame === 'scramble' && <Scramble {...ctx} />}
+          {activeGame === 'crossword' && <Crossword {...ctx} />}
           {activeGame === 'store' && <Rewards {...ctx} />}
         </div>
       </div>

@@ -562,4 +562,28 @@ export const BADGES = [
     stat: 'perfectRounds',
     target: 1,
   },
+  {
+    id: 'cross-starter',
+    name: 'Crossword Starter',
+    icon: '✏️',
+    desc: 'Finish a Mini Crossword.',
+    stat: 'crosswordsFinished',
+    target: 1,
+  },
+  {
+    id: 'cross-fan',
+    name: 'Crossword Fan',
+    icon: '📰',
+    desc: 'Finish 10 Mini Crosswords.',
+    stat: 'crosswordsFinished',
+    target: 10,
+  },
+  {
+    id: 'cross-clean',
+    name: 'Clean Grid',
+    icon: '✅',
+    desc: 'Finish a Mini Crossword with no wrong words.',
+    stat: 'cleanCrosswords',
+    target: 1,
+  },
 ];

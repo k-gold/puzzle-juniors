@@ -42,6 +42,8 @@ export function buildStats({
     daysPlayed: counters.daysPlayed,
     scrambleWords: counters.scrambleWords,
     perfectRounds: counters.perfectRounds,
+    crosswordsFinished: counters.crosswordsFinished,
+    cleanCrosswords: counters.cleanCrosswords,
   };
 }
 

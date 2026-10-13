@@ -138,6 +138,7 @@ export default function Rewards({
   wordSearchPoints,
   wordlePoints,
   scramblePoints,
+  crosswordPoints,
   unlockedThemes,
   seasonsEarned,
   activeSeason,
@@ -158,6 +159,7 @@ export default function Rewards({
     { label: 'Find Words', value: wordSearchPoints },
     { label: 'Guess the Word', value: wordlePoints },
     { label: 'Word Scramble', value: scramblePoints },
+    { label: 'Mini Crossword', value: crosswordPoints },
   ];
   const selectedBadge = BADGES.find((b) => b.id === badgeTooltip);
 
@@ -235,7 +237,7 @@ export default function Rewards({
         <div
           style={{
             display: 'grid',
-            gridTemplateColumns: 'repeat(2, 1fr)',
+            gridTemplateColumns: 'repeat(auto-fit, minmax(100px, 1fr))',
             gap: '10px',
           }}
         >
