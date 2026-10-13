@@ -9,9 +9,12 @@ const firstSelection = (puzzle) => {
   return { r: entry.cells[0][0], c: entry.cells[0][1], dir: entry.dir };
 };
 
-const randomGrid = (not) => {
-  const options = GRIDS.filter((g) => g !== not);
-  return options[Math.floor(Math.random() * options.length)];
+// A puzzle the player has not seen yet, until every puzzle has been seen. Then the list starts over.
+const pickGrid = (seen, current) => {
+  const unseen = GRIDS.filter((g) => !seen.includes(g) && g !== current);
+  const options = unseen.length ? unseen : GRIDS.filter((g) => g !== current);
+  const grid = options[Math.floor(Math.random() * options.length)];
+  return { grid, seen: unseen.length ? [...seen, grid] : [grid] };
 };
 
 // Mini Crossword. Type a letter into the selected square. When a word is full it checks
@@ -23,7 +26,11 @@ export function useCrossword(savedState, progress) {
   // A saved puzzle that no longer exists is replaced
   const saved = savedState?.crossword;
   const savedOk = saved && GRIDS.includes(saved.grid);
-  const [grid, setGrid] = useState(() => (savedOk ? saved.grid : randomGrid()));
+  const [start] = useState(() =>
+    savedOk ? { grid: saved.grid, seen: saved.seen || [saved.grid] } : pickGrid([], ''),
+  );
+  const [grid, setGrid] = useState(start.grid);
+  const [seen, setSeen] = useState(start.seen); // puzzles played since the list last started over
   const [letters, setLetters] = useState(savedOk ? saved.letters || {} : {}); // "r,c" -> letter
   const [solved, setSolved] = useState(savedOk ? saved.solved || [] : []); // entry ids
   const [mistakes, setMistakes] = useState(savedOk ? saved.mistakes || 0 : 0);
@@ -33,8 +40,8 @@ export function useCrossword(savedState, progress) {
   const [selected, setSelected] = useState(() => firstSelection(puzzle));
   // What gets saved (stable between renders, so saving only happens when something changes)
   const crosswordState = useMemo(
-    () => ({ grid, letters, solved, mistakes }),
-    [grid, letters, solved, mistakes],
+    () => ({ grid, seen, letters, solved, mistakes }),
+    [grid, seen, letters, solved, mistakes],
   );
   const done = solved.length === puzzle.entries.length;
   const lockedCells = new Set(
@@ -219,8 +226,10 @@ export function useCrossword(savedState, progress) {
   };
 
   const newCrossword = () => {
-    const next = randomGrid(grid);
+    const picked = pickGrid(seen, grid);
+    const next = picked.grid;
     setGrid(next);
+    setSeen(picked.seen);
     setLetters({});
     setSolved([]);
     setMistakes(0);

@@ -61,3 +61,7 @@ test('black squares along the outside are left out, ones inside the puzzle are d
   assert.ok(puzzle.outside.has('3,0'));
   assert.ok(puzzle.outside.has('3,1'), 'it connects to the edge through another black square');
 });
+
+test('there are plenty of puzzles', () => {
+  assert.ok(GRIDS.length >= 90, `only ${GRIDS.length} puzzles`);
+});
