@@ -9,6 +9,7 @@ export function buildStats({
   wordleWins,
   wordleStreak,
   dailyStreak,
+  bestPlayStreak = 0,
   counters,
   foundWords,
   unlockedThemes,
@@ -21,6 +22,7 @@ export function buildStats({
     wordleWins,
     wordleStreak,
     dailyStreak,
+    bestPlayStreak,
     beeGames: gamesCompleted.spelling || 0,
     searchGames: gamesCompleted.wordsearch || 0,
     allGames: Math.min(

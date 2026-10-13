@@ -55,7 +55,7 @@ The tests include a smoke test that renders every screen, so a change that break
 
 ## Offline, home screen and sound
 
-The site works offline and can be added to a phone's home screen (on iPhone: Safari, Share, Add to Home Screen). No app store or developer account is involved. At build time `scripts/precache-plugin.mjs` writes `dist/sw.js`, a small service worker that saves every built file, so there is nothing to maintain by hand. Page loads try the network first, so new versions arrive as soon as a player is online. The browser tab icon is `public/favicon.svg` (with `favicon-32.png` as a fallback). The app icon is `public/icons/app-icon.svg`, rendered to the PNG sizes listed in `public/manifest.webmanifest`.
+The site works offline and can be added to a phone's home screen (on iPhone: Safari, Share, Add to Home Screen). No app store or developer account is involved. At build time `scripts/precache-plugin.mjs` writes `dist/sw.js`, a small service worker that saves every built file, so there is nothing to maintain by hand. Page loads try the network first, so new versions arrive as soon as a player is online. The preview image shown when the site is shared is `public/og-image.png` (1200x630), referenced by the `og:` tags in `index.html`; links are cached by chat apps, so a changed image can take a while to appear. The browser tab icon is `public/favicon.svg` (with `favicon-32.png` as a fallback). The app icon is `public/icons/app-icon.svg`, rendered to the PNG sizes listed in `public/manifest.webmanifest`.
 
 Sound effects are made in the browser (`src/lib/sound.js`), so there are no sound files. They are off until a player turns them on in Rewards, Settings.
 
@@ -101,6 +101,8 @@ This rewrites `src/data/beePuzzleList.js` with the letters, a center letter, and
 **Keep words kid-safe.** `scripts/blocked-words.txt` lists slurs, vulgar, sexual and drug words. Run `node scripts/filter-dictionary.mjs` after editing it: that removes them from `public/words.txt`, so they cannot be entered for points. `tests/safety.test.js` fails if a blocked word is in the dictionary or in any game's words. Guess the Word answers are picked by position, so to replace one, change it in place rather than deleting it.
 
 Players' saved puzzles must be one of the puzzles in the list. If you remove a puzzle, anyone halfway through it gets a new one.
+
+**Play streak.** `src/lib/streak.js` counts days in a row on which the player earned points. `useProgress` saves `playStreak` and `bestPlayStreak`; the streak badges (`streak-3`, `streak-7`, `streak-14`) are measured by the best streak, so missing a day never takes a badge away. This is separate from the Guess the Word daily streak and from the total days played.
 
 **Add a badge.** Add one line to `BADGES` in `src/data/rewards.js`: an id, name, icon, description, the stat it is measured by, and the target. The stats are listed in `src/lib/badgeStats.js`. For something new to count (say, a new kind of win), add a name to `counters` in `src/hooks/useProgress.js`, call `addCount('name')` where it happens, and expose it in `badgeStats.js`. Badges are awarded by one check in `src/hooks/useBadges.js`, so players who already qualify get a new badge the next time they open the site. The tests make sure every badge points at a real stat.
 

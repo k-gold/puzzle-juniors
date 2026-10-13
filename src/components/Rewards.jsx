@@ -139,6 +139,8 @@ export default function Rewards({
   wordlePoints,
   scramblePoints,
   crosswordPoints,
+  playStreak,
+  bestPlayStreak,
   unlockedThemes,
   seasonsEarned,
   activeSeason,
@@ -276,6 +278,20 @@ export default function Rewards({
       </section>
 
       <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+        {/* Play streak */}
+        <Card
+          colors={colors}
+          title="Play Streak"
+          count={bestPlayStreak > 0 ? `Best: ${bestPlayStreak}` : undefined}
+        >
+          <p style={{ margin: 0, fontSize: '15px', fontWeight: '700', color: colors.text }}>
+            <span aria-hidden="true">🔥 </span>
+            {playStreak === 0
+              ? 'Earn points today to start a streak.'
+              : `${playStreak} ${playStreak === 1 ? 'day' : 'days'} in a row. Keep it going tomorrow!`}
+          </p>
+        </Card>
+
         {/* Word Search themes */}
         <Card
           colors={colors}

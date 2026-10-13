@@ -2,6 +2,7 @@ import { useState, useEffect, useRef } from 'react';
 import { WORD_SEARCH_THEMES, SEASONS } from '../data/rewards.js';
 import { seasonOn } from '../lib/seasons.js';
 import { play, setSoundEnabled } from '../lib/sound.js';
+import { nextStreak, currentStreak, dayString } from '../lib/streak.js';
 
 export function useProgress(savedState) {
   // Points system
@@ -65,6 +66,8 @@ export function useProgress(savedState) {
     ...savedState?.counters,
   });
   const [lastPlayedDate, setLastPlayedDate] = useState(savedState?.lastPlayedDate || '');
+  const [playStreak, setPlayStreak] = useState(savedState?.playStreak || 0);
+  const [bestPlayStreak, setBestPlayStreak] = useState(savedState?.bestPlayStreak || 0);
   const addCount = (name, amount = 1) =>
     setCounters((prev) => ({ ...prev, [name]: prev[name] + amount }));
 
@@ -130,9 +133,12 @@ export function useProgress(savedState) {
     }
 
     // Count each day the player earns points on
-    const today = new Date().toDateString();
+    const today = dayString();
     if (lastPlayedDate !== today) {
+      const streak = nextStreak(lastPlayedDate, playStreak);
       setLastPlayedDate(today);
+      setPlayStreak(streak);
+      setBestPlayStreak((prev) => Math.max(prev, streak));
       addCount('daysPlayed');
     }
   };
@@ -189,6 +195,9 @@ export function useProgress(savedState) {
     counters,
     addCount,
     lastPlayedDate,
+    playStreak: currentStreak(lastPlayedDate, playStreak),
+    savedPlayStreak: playStreak,
+    bestPlayStreak,
     toasts,
     notify,
     badgeTooltip,
